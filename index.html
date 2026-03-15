@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Karteikarten">
+<title>Karteikarten</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface2: #252525;
+    --accent: #4a9eff;
+    --accent-dim: #4a9eff22;
+    --green: #34c759;
+    --orange: #ff9f0a;
+    --red: #ff453a;
+    --text: #f5f5f5;
+    --text2: #999;
+    --radius: 16px;
+    --safe-top: env(safe-area-inset-top, 20px);
+    --safe-bottom: env(safe-area-inset-bottom, 20px);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* ---- NAV ---- */
+  .nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #111;
+    border-top: 1px solid #222;
+    padding: 8px 0 calc(8px + var(--safe-bottom));
+    z-index: 100;
+  }
+  .nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    color: var(--text2);
+    font-size: 10px;
+    padding: 4px 16px;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .nav-btn.active { color: var(--accent); }
+  .nav-btn svg { width: 24px; height: 24px; }
+
+  /* ---- SCREENS ---- */
+  .screen {
+    display: none;
+    flex-direction: column;
+    height: 100dvh;
+    padding: calc(var(--safe-top) + 12px) 20px calc(80px + var(--safe-bottom));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .screen.active { display: flex; }
+  .screen-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+
+  /* ---- REVIEW SCREEN ---- */
+  .review-screen { align-items: center; justify-content: center; padding-top: var(--safe-top); }
+
+  .empty-state {
+    text-align: center;
+    color: var(--text2);
+    padding: 40px 20px;
+  }
+  .empty-state p { margin-top: 12px; font-size: 15px; line-height: 1.5; }
+  .empty-state svg { opacity: 0.3; }
+
+  .review-info {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: var(--text2);
+  }
+  .review-info span { color: var(--accent); font-weight: 600; }
+
+  .card-container {
+    width: 100%;
+    max-width: 340px;
+    height: 220px;
+    perspective: 1000px;
+    cursor: pointer;
+    margin-bottom: 32px;
+  }
+  .card-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card-inner.flipped { transform: rotateY(180deg); }
+  .card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid #333;
+  }
+  .card-back { transform: rotateY(180deg); }
+  .card-lang {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text2);
+    margin-bottom: 12px;
+  }
+  .card-word {
+    font-size: 28px;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.3;
+  }
+  .card-hint {
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: 16px;
+  }
+
+  .rating-buttons {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    max-width: 340px;
+  }
+  .rating-btn {
+    flex: 1;
+    padding: 14px 8px;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #fff;
+    transition: transform 0.1s, opacity 0.2s;
+  }
+  .rating-btn:active { transform: scale(0.95); }
+  .rating-btn.again { background: var(--red); }
+  .rating-btn.hard { background: var(--orange); }
+  .rating-btn.good { background: var(--green); }
+  .rating-btn.easy { background: var(--accent); }
+  .rating-buttons.hidden { visibility: hidden; }
+
+  .done-message {
+    text-align: center;
+    color: var(--text2);
+  }
+  .done-message .check { font-size: 48px; margin-bottom: 16px; }
+  .done-message p { font-size: 15px; line-height: 1.5; }
+
+  /* ---- MODE PICKER ---- */
+  .mode-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    max-width: 340px;
+  }
+  .mode-picker-title {
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .mode-btn {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: var(--surface);
+    border: 1px solid #333;
+    border-radius: var(--radius);
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .mode-btn:active { background: var(--surface2); }
+  .mode-btn-icon {
+    font-size: 28px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface2);
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+  .mode-btn-text { flex: 1; }
+  .mode-btn-label { font-size: 16px; font-weight: 600; }
+  .mode-btn-desc { font-size: 12px; color: var(--text2); margin-top: 3px; }
+  .mode-btn-count { font-size: 12px; color: var(--accent); margin-top: 4px; font-weight: 500; }
+
+  /* ---- TYPE MODE ---- */
+  .type-card {
+    width: 100%;
+    max-width: 340px;
+    background: var(--surface);
+    border: 1px solid #333;
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .type-input-wrap {
+    width: 100%;
+    max-width: 340px;
+    margin-bottom: 16px;
+  }
+  .type-input {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 2px solid #333;
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 18px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .type-input:focus { border-color: var(--accent); }
+  .type-input::placeholder { color: #444; }
+  .type-input.correct { border-color: var(--green); color: var(--green); }
+  .type-input.wrong { border-color: var(--red); color: var(--red); }
+  .check-btn {
+    width: 100%;
+    max-width: 340px;
+    padding: 14px;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 12px;
+    transition: opacity 0.2s;
+  }
+  .check-btn:active { opacity: 0.8; }
+  .type-result {
+    width: 100%;
+    max-width: 340px;
+    text-align: center;
+    margin-bottom: 16px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .type-result .correct-word { color: var(--green); font-weight: 600; font-size: 22px; }
+  .type-result .wrong-label { color: var(--red); font-size: 13px; }
+  .type-result .your-answer { color: var(--red); text-decoration: line-through; font-size: 16px; }
+  .next-btn {
+    width: 100%;
+    max-width: 340px;
+    padding: 14px;
+    background: var(--surface2);
+    border: 1px solid #444;
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .next-btn:active { background: #333; }
+
+  /* ---- WORDS SCREEN ---- */
+  .add-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .input-row { display: flex; gap: 10px; }
+  .input-row input {
+    flex: 1;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid #333;
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .input-row input:focus { border-color: var(--accent); }
+  .input-row input::placeholder { color: #555; }
+  .add-btn {
+    padding: 14px;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .add-btn:active { opacity: 0.8; }
+
+  .word-count {
+    font-size: 13px;
+    color: var(--text2);
+    margin-bottom: 12px;
+  }
+
+  .word-list { display: flex; flex-direction: column; gap: 8px; }
+  .word-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid transparent;
+  }
+  .word-item-text { flex: 1; }
+  .word-item-de { font-weight: 600; font-size: 15px; }
+  .word-item-en { font-size: 13px; color: var(--text2); margin-top: 2px; }
+  .word-item-streak {
+    font-size: 11px;
+    color: var(--text2);
+    margin-top: 4px;
+  }
+  .word-item-streak .learning { color: var(--orange); }
+  .word-item-streak .known { color: var(--green); }
+  .word-delete {
+    background: none;
+    border: none;
+    color: #555;
+    font-size: 20px;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .word-delete:hover { color: var(--red); }
+
+  .search-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid #333;
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 15px;
+    outline: none;
+    margin-bottom: 16px;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: #555; }
+
+  /* ---- SETTINGS SCREEN ---- */
+  .settings-group {
+    background: var(--surface);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .settings-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid #222;
+  }
+  .settings-item:last-child { border-bottom: none; }
+  .settings-label { font-size: 15px; }
+  .settings-desc { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+  .settings-btn {
+    padding: 8px 16px;
+    background: var(--surface2);
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .settings-btn:active { background: #333; }
+  .settings-btn.danger { color: var(--red); border-color: var(--red); }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-num { font-size: 28px; font-weight: 700; color: var(--accent); }
+  .stat-label { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+  /* ---- MODAL ---- */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 200;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: 20px 20px 0 0;
+    padding: 24px 20px calc(24px + var(--safe-bottom));
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+  }
+  .modal h3 { font-size: 18px; margin-bottom: 8px; }
+  .modal p { font-size: 14px; color: var(--text2); margin-bottom: 20px; line-height: 1.4; }
+  .modal-actions { display: flex; gap: 10px; }
+  .modal-actions button {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .modal-cancel { background: var(--surface2); color: var(--text); }
+  .modal-confirm { background: var(--red); color: #fff; }
+
+  /* file input hidden */
+  #importFile { display: none; }
+</style>
+</head>
+<body>
+
+<!-- ===== REVIEW SCREEN ===== -->
+<div class="screen review-screen active" id="screenReview">
+  <div id="reviewContent"></div>
+</div>
+
+<!-- ===== WORDS SCREEN ===== -->
+<div class="screen" id="screenWords">
+  <h1 class="screen-title">Words</h1>
+  <div class="add-form">
+    <div class="input-row">
+      <input type="text" id="inputDe" placeholder="German" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <input type="text" id="inputEn" placeholder="English" autocomplete="off" autocapitalize="none" spellcheck="false">
+    </div>
+    <button class="add-btn" onclick="addWord()">Add Word</button>
+  </div>
+  <input type="text" class="search-input" id="searchInput" placeholder="Search words..." oninput="renderWordList()">
+  <div class="word-count" id="wordCount"></div>
+  <div class="word-list" id="wordList"></div>
+</div>
+
+<!-- ===== SETTINGS SCREEN ===== -->
+<div class="screen" id="screenSettings">
+  <h1 class="screen-title">Settings</h1>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Total Words</div></div>
+    <div class="stat-card"><div class="stat-num" id="statDue">0</div><div class="stat-label">Due Today</div></div>
+    <div class="stat-card"><div class="stat-num" id="statLearning">0</div><div class="stat-label">Learning</div></div>
+    <div class="stat-card"><div class="stat-num" id="statKnown">0</div><div class="stat-label">Known</div></div>
+  </div>
+
+  <div class="settings-group">
+    <div class="settings-item">
+      <div>
+        <div class="settings-label">New cards per session</div>
+        <div class="settings-desc">How many new cards to introduce</div>
+      </div>
+      <select id="newCardsLimit" onchange="saveSettings()" style="background:var(--surface2);color:var(--text);border:1px solid #333;border-radius:8px;padding:8px 12px;font-size:14px;">
+        <option value="5">5</option>
+        <option value="10" selected>10</option>
+        <option value="15">15</option>
+        <option value="20">20</option>
+        <option value="999">All</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="settings-group">
+    <div class="settings-item">
+      <div>
+        <div class="settings-label">Export Backup</div>
+        <div class="settings-desc">Save all words & progress</div>
+      </div>
+      <button class="settings-btn" onclick="exportData()">Export</button>
+    </div>
+    <div class="settings-item">
+      <div>
+        <div class="settings-label">Import Backup</div>
+        <div class="settings-desc">Restore from a backup file</div>
+      </div>
+      <button class="settings-btn" onclick="document.getElementById('importFile').click()">Import</button>
+      <input type="file" id="importFile" accept=".json" onchange="importData(event)">
+    </div>
+  </div>
+
+  <div class="settings-group">
+    <div class="settings-item">
+      <div>
+        <div class="settings-label">Delete All Data</div>
+        <div class="settings-desc">Remove all words and progress</div>
+      </div>
+      <button class="settings-btn danger" onclick="showDeleteModal()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== NAV ===== -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="switchScreen('Review')" id="navReview">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="3"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    <span>Review</span>
+  </button>
+  <button class="nav-btn" onclick="switchScreen('Words')" id="navWords">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    <span>Words</span>
+  </button>
+  <button class="nav-btn" onclick="switchScreen('Settings')" id="navSettings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    <span>Settings</span>
+  </button>
+</nav>
+
+<!-- ===== DELETE MODAL ===== -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <h3>Delete Everything?</h3>
+    <p>This will remove all your words and progress. This cannot be undone. Consider exporting a backup first.</p>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="hideDeleteModal()">Cancel</button>
+      <button class="modal-confirm" onclick="deleteAll()">Delete All</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+let words = []; // { id, de, en, ease, interval, repetitions, nextReview, lastReview }
+let settings = { newCardsLimit: 10 };
+
+const STORAGE_KEY = 'karteikarten_words';
+const SETTINGS_KEY = 'karteikarten_settings';
+
+function load() {
+  try {
+    const d = localStorage.getItem(STORAGE_KEY);
+    if (d) words = JSON.parse(d);
+    const s = localStorage.getItem(SETTINGS_KEY);
+    if (s) settings = JSON.parse(s);
+  } catch(e) {}
+  document.getElementById('newCardsLimit').value = settings.newCardsLimit || 10;
+}
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
+}
+
+function saveSettings() {
+  settings.newCardsLimit = parseInt(document.getElementById('newCardsLimit').value);
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+}
+
+// ===== SM-2 SPACED REPETITION =====
+function today() {
+  return Math.floor(Date.now() / 86400000);
+}
+
+function createCard(de, en) {
+  return {
+    id: Date.now() + Math.random(),
+    de: de.trim(),
+    en: en.trim(),
+    ease: 2.5,
+    interval: 0,
+    repetitions: 0,
+    nextReview: today(),
+    lastReview: 0
+  };
+}
+
+function reviewCard(card, quality) {
+  // quality: 0=again, 1=hard, 2=good, 3=easy
+  const q = [0, 2, 4, 5][quality]; // map to SM-2 scale (0-5)
+
+  if (q < 3) {
+    // Failed - reset
+    card.repetitions = 0;
+    card.interval = 0;
+  } else {
+    if (card.repetitions === 0) {
+      card.interval = 1;
+    } else if (card.repetitions === 1) {
+      card.interval = 3;
+    } else {
+      card.interval = Math.round(card.interval * card.ease);
+    }
+    card.repetitions++;
+  }
+
+  // Update ease factor
+  card.ease = Math.max(1.3, card.ease + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)));
+
+  // Special intervals for hard/easy
+  if (quality === 1 && card.interval > 1) {
+    card.interval = Math.max(1, Math.round(card.interval * 0.7));
+  } else if (quality === 3) {
+    card.interval = Math.max(card.interval, Math.round(card.interval * 1.3));
+  }
+
+  card.nextReview = today() + Math.max(quality === 0 ? 0 : 1, card.interval);
+  card.lastReview = today();
+
+  save();
+}
+
+// ===== REVIEW =====
+let currentCard = null;
+let reviewMode = null; // 'en2de', 'en2de_flip', or 'de2en', set by mode picker
+let reviewQueue = [];
+let isFlipped = false;
+
+function buildReviewQueue() {
+  const d = today();
+  const due = words.filter(w => w.nextReview <= d);
+
+  // Separate into review (seen before) and new cards
+  const review = due.filter(w => w.repetitions > 0);
+  const newCards = due.filter(w => w.repetitions === 0);
+
+  // Limit new cards
+  const limit = settings.newCardsLimit || 10;
+  const limitedNew = newCards.slice(0, limit);
+
+  // Shuffle both
+  shuffle(review);
+  shuffle(limitedNew);
+
+  // Review cards first, then new
+  reviewQueue = [...review, ...limitedNew];
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function getDueCount() {
+  const d = today();
+  const due = words.filter(w => w.nextReview <= d);
+  const review = due.filter(w => w.repetitions > 0);
+  const newCards = due.filter(w => w.repetitions === 0);
+  const limit = settings.newCardsLimit || 10;
+  return review.length + Math.min(newCards.length, limit);
+}
+
+function showModePicker() {
+  reviewMode = null;
+  const container = document.getElementById('reviewContent');
+
+  if (words.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="3"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        <p>No words yet.<br>Go to <strong>Words</strong> tab to add your first flashcard.</p>
+      </div>`;
+    return;
+  }
+
+  const count = getDueCount();
+
+  if (count === 0) {
+    container.innerHTML = `
+      <div class="done-message">
+        <div class="check">&#10003;</div>
+        <p>All done for now!<br>Come back later for more reviews.</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="mode-picker">
+      <div class="mode-picker-title">Review</div>
+      <button class="mode-btn" onclick="startReview('en2de')">
+        <div class="mode-btn-icon">EN</div>
+        <div class="mode-btn-text">
+          <div class="mode-btn-label">English &rarr; German (Type)</div>
+          <div class="mode-btn-desc">See English, type the German word</div>
+          <div class="mode-btn-count">${count} card${count !== 1 ? 's' : ''} due</div>
+        </div>
+      </button>
+      <button class="mode-btn" onclick="startReview('en2de_flip')">
+        <div class="mode-btn-icon">EN</div>
+        <div class="mode-btn-text">
+          <div class="mode-btn-label">English &rarr; German (Flip)</div>
+          <div class="mode-btn-desc">See English, flip to reveal German</div>
+          <div class="mode-btn-count">${count} card${count !== 1 ? 's' : ''} due</div>
+        </div>
+      </button>
+      <button class="mode-btn" onclick="startReview('de2en')">
+        <div class="mode-btn-icon">DE</div>
+        <div class="mode-btn-text">
+          <div class="mode-btn-label">German &rarr; English (Flip)</div>
+          <div class="mode-btn-desc">See German, flip to reveal English</div>
+          <div class="mode-btn-count">${count} card${count !== 1 ? 's' : ''} due</div>
+        </div>
+      </button>
+    </div>`;
+}
+
+function startReview(mode) {
+  reviewMode = mode;
+  buildReviewQueue();
+  showNextCard();
+}
+
+function showNextCard() {
+  isFlipped = false;
+  const container = document.getElementById('reviewContent');
+
+  if (reviewQueue.length === 0) {
+    container.innerHTML = `
+      <div class="done-message">
+        <div class="check">&#10003;</div>
+        <p>All done for now!<br>Come back later for more reviews.</p>
+      </div>`;
+    return;
+  }
+
+  currentCard = reviewQueue.shift();
+  const remaining = reviewQueue.length + 1;
+
+  if (reviewMode === 'en2de') {
+    // TYPE MODE: show English, type German
+    container.innerHTML = `
+      <div class="review-info"><span>${remaining}</span> card${remaining !== 1 ? 's' : ''} remaining</div>
+      <div class="type-card">
+        <div class="card-lang">ENGLISH</div>
+        <div class="card-word">${escHtml(currentCard.en)}</div>
+      </div>
+      <div class="type-input-wrap">
+        <input type="text" class="type-input" id="typeAnswer" placeholder="Type in German..." autocomplete="off" autocapitalize="none" spellcheck="false">
+      </div>
+      <button class="check-btn" id="checkBtn" onclick="checkAnswer()">Check</button>
+      <div class="type-result" id="typeResult"></div>
+      <div id="typeRating"></div>`;
+
+    const inp = document.getElementById('typeAnswer');
+    inp.focus();
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const checkBtn = document.getElementById('checkBtn');
+        if (checkBtn) {
+          checkAnswer();
+        } else {
+          // Already checked — next card
+          const nb = document.getElementById('nextBtn');
+          if (nb) nb.click();
+        }
+      }
+    });
+  } else {
+    // FLIP MODE: de2en or en2de_flip
+    const showDeFront = reviewMode === 'de2en';
+    const frontLang = showDeFront ? 'Deutsch' : 'English';
+    const frontWord = showDeFront ? currentCard.de : currentCard.en;
+    const backLang = showDeFront ? 'English' : 'Deutsch';
+    const backWord = showDeFront ? currentCard.en : currentCard.de;
+
+    container.innerHTML = `
+      <div class="review-info"><span>${remaining}</span> card${remaining !== 1 ? 's' : ''} remaining</div>
+      <div class="card-container" onclick="flipCard()">
+        <div class="card-inner" id="cardInner">
+          <div class="card-front">
+            <div class="card-lang">${frontLang}</div>
+            <div class="card-word">${escHtml(frontWord)}</div>
+            <div class="card-hint">tap to flip</div>
+          </div>
+          <div class="card-back">
+            <div class="card-lang">${backLang}</div>
+            <div class="card-word">${escHtml(backWord)}</div>
+            <div class="card-hint">tap to flip back</div>
+          </div>
+        </div>
+      </div>
+      <div class="rating-buttons hidden" id="ratingBtns">
+        <button class="rating-btn again" onclick="rate(0)">Again</button>
+        <button class="rating-btn hard" onclick="rate(1)">Hard</button>
+        <button class="rating-btn good" onclick="rate(2)">Good</button>
+        <button class="rating-btn easy" onclick="rate(3)">Easy</button>
+      </div>`;
+  }
+}
+
+function checkAnswer() {
+  if (!currentCard) return;
+  const inp = document.getElementById('typeAnswer');
+  const answer = inp.value.trim();
+  if (!answer) return;
+
+  const correct = currentCard.de.trim().toLowerCase();
+  const given = answer.toLowerCase();
+  const isCorrect = given === correct;
+
+  inp.disabled = true;
+
+  // Remove the check button
+  const checkBtn = document.getElementById('checkBtn');
+  if (checkBtn) checkBtn.remove();
+
+  const resultDiv = document.getElementById('typeResult');
+  const ratingDiv = document.getElementById('typeRating');
+
+  if (isCorrect) {
+    inp.classList.add('correct');
+    resultDiv.innerHTML = `<div class="correct-word">${escHtml(currentCard.de)}</div>`;
+    // Auto-rate as good and move on after a moment
+    ratingDiv.innerHTML = `<button class="next-btn" id="nextBtn" onclick="rate(2)">Next</button>`;
+  } else {
+    inp.classList.add('wrong');
+    resultDiv.innerHTML = `
+      <div class="wrong-label">Correct answer:</div>
+      <div class="correct-word">${escHtml(currentCard.de)}</div>`;
+    // Auto-rate as again
+    ratingDiv.innerHTML = `<button class="next-btn" id="nextBtn" onclick="rate(0)">Next</button>`;
+  }
+
+  document.getElementById('nextBtn').focus();
+}
+
+function flipCard() {
+  const inner = document.getElementById('cardInner');
+  if (!isFlipped) {
+    isFlipped = true;
+    inner.classList.add('flipped');
+    document.getElementById('ratingBtns').classList.remove('hidden');
+  } else {
+    isFlipped = false;
+    inner.classList.remove('flipped');
+  }
+}
+
+function rate(quality) {
+  if (!currentCard) return;
+  reviewCard(currentCard, quality);
+  showNextCard();
+  updateStats();
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ===== WORDS LIST =====
+function addWord() {
+  const de = document.getElementById('inputDe').value.trim();
+  const en = document.getElementById('inputEn').value.trim();
+  if (!de || !en) return;
+
+  words.push(createCard(de, en));
+  save();
+
+  document.getElementById('inputDe').value = '';
+  document.getElementById('inputEn').value = '';
+  document.getElementById('inputDe').focus();
+
+  renderWordList();
+  buildReviewQueue();
+}
+
+function deleteWord(id) {
+  words = words.filter(w => w.id !== id);
+  save();
+  renderWordList();
+  reviewQueue = reviewQueue.filter(w => w.id !== id);
+  updateStats();
+}
+
+function renderWordList() {
+  const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  const filtered = words.filter(w =>
+    w.de.toLowerCase().includes(search) || w.en.toLowerCase().includes(search)
+  );
+
+  document.getElementById('wordCount').textContent = `${words.length} word${words.length !== 1 ? 's' : ''}`;
+
+  // Show newest first
+  const sorted = [...filtered].reverse();
+
+  const list = document.getElementById('wordList');
+  list.innerHTML = sorted.map(w => {
+    let status = '';
+    if (w.repetitions === 0) status = '<span>New</span>';
+    else if (w.interval < 7) status = `<span class="learning">Learning</span>`;
+    else status = `<span class="known">Known (${w.interval}d)</span>`;
+
+    return `<div class="word-item">
+      <div class="word-item-text">
+        <div class="word-item-de">${escHtml(w.de)}</div>
+        <div class="word-item-en">${escHtml(w.en)}</div>
+        <div class="word-item-streak">${status}</div>
+      </div>
+      <button class="word-delete" onclick="deleteWord(${w.id})">&times;</button>
+    </div>`;
+  }).join('');
+}
+
+// Handle enter key in inputs
+document.getElementById('inputDe').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('inputEn').focus();
+});
+document.getElementById('inputEn').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addWord();
+});
+
+// ===== STATS =====
+function updateStats() {
+  const d = today();
+  document.getElementById('statTotal').textContent = words.length;
+  document.getElementById('statDue').textContent = words.filter(w => w.nextReview <= d).length;
+  document.getElementById('statLearning').textContent = words.filter(w => w.repetitions > 0 && w.interval < 7).length;
+  document.getElementById('statKnown').textContent = words.filter(w => w.interval >= 7).length;
+}
+
+// ===== EXPORT / IMPORT =====
+function exportData() {
+  const data = { words, settings, exportDate: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `karteikarten-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.words && Array.isArray(data.words)) {
+        words = data.words;
+        if (data.settings) settings = data.settings;
+        save();
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+        document.getElementById('newCardsLimit').value = settings.newCardsLimit || 10;
+        buildReviewQueue();
+        renderWordList();
+        updateStats();
+        switchScreen('Review');
+        alert('Import successful! ' + words.length + ' words loaded.');
+      } else {
+        alert('Invalid backup file.');
+      }
+    } catch(err) {
+      alert('Could not read file.');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ===== DELETE ALL =====
+function showDeleteModal() { document.getElementById('deleteModal').classList.add('show'); }
+function hideDeleteModal() { document.getElementById('deleteModal').classList.remove('show'); }
+function deleteAll() {
+  words = [];
+  save();
+  hideDeleteModal();
+  buildReviewQueue();
+  renderWordList();
+  updateStats();
+  switchScreen('Review');
+}
+
+// ===== NAVIGATION =====
+function switchScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen' + name).classList.add('active');
+  document.getElementById('nav' + name).classList.add('active');
+
+  if (name === 'Review') {
+    showModePicker();
+  }
+  if (name === 'Words') renderWordList();
+  if (name === 'Settings') updateStats();
+}
+
+// ===== INIT =====
+load();
+showModePicker();
+updateStats();
+</script>
+</body>
+</html>
