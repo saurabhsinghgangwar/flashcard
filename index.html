@@ -858,12 +858,15 @@ function showNextCard() {
           </div>
         </div>
       </div>
-      <div class="rating-buttons hidden" id="ratingBtns">
-        <button class="rating-btn again" onclick="rate(0)">Again</button>
-        <button class="rating-btn hard" onclick="rate(1)">Hard</button>
-        <button class="rating-btn good" onclick="rate(2)">Good</button>
-        <button class="rating-btn easy" onclick="rate(3)">Easy</button>
-      </div>`;
+      ${isPracticeAll
+        ? '<div class="hidden" id="ratingBtns" style="width:100%;max-width:340px"><button class="next-btn" onclick="rate(0)">Next</button></div>'
+        : `<div class="rating-buttons hidden" id="ratingBtns">
+          <button class="rating-btn again" onclick="rate(0)">Again</button>
+          <button class="rating-btn hard" onclick="rate(1)">Hard</button>
+          <button class="rating-btn good" onclick="rate(2)">Good</button>
+          <button class="rating-btn easy" onclick="rate(3)">Easy</button>
+        </div>`
+      }`;
   }
 }
 
