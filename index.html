@@ -663,6 +663,9 @@ let currentCard = null;
 let reviewMode = null; // 'en2de', 'en2de_flip', or 'de2en', set by mode picker
 let reviewQueue = [];
 let isFlipped = false;
+let isPracticeAll = false;
+let practiceDirections = [];
+let practiceIndex = 0;
 
 function buildReviewQueue() {
   const d = today();
@@ -714,41 +717,46 @@ function showModePicker() {
   }
 
   const count = getDueCount();
+  const total = words.length;
 
-  if (count === 0) {
-    container.innerHTML = `
-      <div class="done-message">
-        <div class="check">&#10003;</div>
-        <p>All done for now!<br>Come back later for more reviews.</p>
-      </div>`;
-    return;
-  }
+  const dueLabel = count > 0
+    ? `<div class="mode-btn-count">${count} card${count !== 1 ? 's' : ''} due</div>`
+    : `<div class="mode-btn-count" style="color:var(--text2)">No cards due</div>`;
 
   container.innerHTML = `
     <div class="mode-picker">
       <div class="mode-picker-title">Review</div>
-      <button class="mode-btn" onclick="startReview('en2de')">
+      <button class="mode-btn" onclick="startReview('en2de')" ${count === 0 ? 'style="opacity:0.4;pointer-events:none"' : ''}>
         <div class="mode-btn-icon">EN</div>
         <div class="mode-btn-text">
           <div class="mode-btn-label">English &rarr; German (Type)</div>
           <div class="mode-btn-desc">See English, type the German word</div>
-          <div class="mode-btn-count">${count} card${count !== 1 ? 's' : ''} due</div>
+          ${dueLabel}
         </div>
       </button>
-      <button class="mode-btn" onclick="startReview('en2de_flip')">
+      <button class="mode-btn" onclick="startReview('en2de_flip')" ${count === 0 ? 'style="opacity:0.4;pointer-events:none"' : ''}>
         <div class="mode-btn-icon">EN</div>
         <div class="mode-btn-text">
           <div class="mode-btn-label">English &rarr; German (Flip)</div>
           <div class="mode-btn-desc">See English, flip to reveal German</div>
-          <div class="mode-btn-count">${count} card${count !== 1 ? 's' : ''} due</div>
+          ${dueLabel}
         </div>
       </button>
-      <button class="mode-btn" onclick="startReview('de2en')">
+      <button class="mode-btn" onclick="startReview('de2en')" ${count === 0 ? 'style="opacity:0.4;pointer-events:none"' : ''}>
         <div class="mode-btn-icon">DE</div>
         <div class="mode-btn-text">
           <div class="mode-btn-label">German &rarr; English (Flip)</div>
           <div class="mode-btn-desc">See German, flip to reveal English</div>
-          <div class="mode-btn-count">${count} card${count !== 1 ? 's' : ''} due</div>
+          ${dueLabel}
+        </div>
+      </button>
+      <div style="border-top:1px solid #333;margin:8px 0"></div>
+      <button class="mode-btn" onclick="startPracticeAll()">
+        <div class="mode-btn-icon" style="font-size:20px">ALL</div>
+        <div class="mode-btn-text">
+          <div class="mode-btn-label">Practice All (Flip)</div>
+          <div class="mode-btn-desc">Go through all your cards, both directions</div>
+          <div class="mode-btn-count">${total} card${total !== 1 ? 's' : ''} total</div>
         </div>
       </button>
     </div>`;
@@ -756,7 +764,21 @@ function showModePicker() {
 
 function startReview(mode) {
   reviewMode = mode;
+  isPracticeAll = false;
   buildReviewQueue();
+  showNextCard();
+}
+
+function startPracticeAll() {
+  isPracticeAll = true;
+  reviewMode = 'de2en'; // start with flip mode
+  // Load ALL cards, shuffle, alternate directions
+  const all = [...words];
+  shuffle(all);
+  reviewQueue = all;
+  // Alternate direction per card
+  practiceDirections = all.map((_, i) => i % 2 === 0 ? 'de2en' : 'en2de_flip');
+  practiceIndex = 0;
   showNextCard();
 }
 
@@ -775,6 +797,12 @@ function showNextCard() {
 
   currentCard = reviewQueue.shift();
   const remaining = reviewQueue.length + 1;
+
+  // In Practice All mode, alternate direction per card
+  if (isPracticeAll) {
+    reviewMode = practiceDirections[practiceIndex] || 'de2en';
+    practiceIndex++;
+  }
 
   if (reviewMode === 'en2de') {
     // TYPE MODE: show English, type German
@@ -889,7 +917,9 @@ function flipCard() {
 
 function rate(quality) {
   if (!currentCard) return;
-  reviewCard(currentCard, quality);
+  if (!isPracticeAll) {
+    reviewCard(currentCard, quality);
+  }
   showNextCard();
   updateStats();
 }
