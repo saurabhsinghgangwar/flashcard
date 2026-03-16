@@ -154,6 +154,18 @@
     color: var(--text2);
     margin-top: 16px;
   }
+  .speak-btn {
+    background: none;
+    border: none;
+    color: var(--text2);
+    padding: 6px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: color 0.2s, background 0.2s;
+  }
+  .speak-btn:active { color: var(--accent); background: var(--accent-dim); }
+  .speak-btn svg { width: 24px; height: 24px; display: block; }
 
   .rating-buttons {
     display: flex;
@@ -791,6 +803,7 @@ function showNextCard() {
       <div class="done-message">
         <div class="check">&#10003;</div>
         <p>All done for now!<br>Come back later for more reviews.</p>
+        <p style="margin-top:20px;font-size:13px;color:#666">Don't forget to <a href="#" onclick="event.preventDefault();exportData()" style="color:var(--accent);text-decoration:underline">export a backup</a> so you don't lose your progress.</p>
       </div>`;
     return;
   }
@@ -842,6 +855,14 @@ function showNextCard() {
     const backLang = showDeFront ? 'English' : 'Deutsch';
     const backWord = showDeFront ? currentCard.en : currentCard.de;
 
+    const deOnFront = showDeFront;
+    const frontSpeak = deOnFront
+      ? `<button class="speak-btn" onclick="event.stopPropagation();speakDe('${currentCard.de.replace(/'/g, "\\'")}')">${speakIcon}</button>`
+      : '';
+    const backSpeak = !deOnFront
+      ? `<button class="speak-btn" onclick="event.stopPropagation();speakDe('${currentCard.de.replace(/'/g, "\\'")}')">${speakIcon}</button>`
+      : '';
+
     container.innerHTML = `
       <div class="review-info"><span>${remaining}</span> card${remaining !== 1 ? 's' : ''} remaining</div>
       <div class="card-container" onclick="flipCard()">
@@ -849,11 +870,13 @@ function showNextCard() {
           <div class="card-front">
             <div class="card-lang">${frontLang}</div>
             <div class="card-word">${escHtml(frontWord)}</div>
+            ${frontSpeak}
             <div class="card-hint">tap to flip</div>
           </div>
           <div class="card-back">
             <div class="card-lang">${backLang}</div>
             <div class="card-word">${escHtml(backWord)}</div>
+            ${backSpeak}
             <div class="card-hint">tap to flip back</div>
           </div>
         </div>
@@ -889,17 +912,17 @@ function checkAnswer() {
   const resultDiv = document.getElementById('typeResult');
   const ratingDiv = document.getElementById('typeRating');
 
+  const speakBtn = `<button class="speak-btn" style="display:inline-block;margin-top:8px" onclick="speakDe('${currentCard.de.replace(/'/g, "\\'")}')">${speakIcon}</button>`;
+
   if (isCorrect) {
     inp.classList.add('correct');
-    resultDiv.innerHTML = `<div class="correct-word">${escHtml(currentCard.de)}</div>`;
-    // Auto-rate as good and move on after a moment
+    resultDiv.innerHTML = `<div class="correct-word">${escHtml(currentCard.de)}</div>${speakBtn}`;
     ratingDiv.innerHTML = `<button class="next-btn" id="nextBtn" onclick="rate(2)">Next</button>`;
   } else {
     inp.classList.add('wrong');
     resultDiv.innerHTML = `
       <div class="wrong-label">Correct answer:</div>
-      <div class="correct-word">${escHtml(currentCard.de)}</div>`;
-    // Auto-rate as again
+      <div class="correct-word">${escHtml(currentCard.de)}</div>${speakBtn}`;
     ratingDiv.innerHTML = `<button class="next-btn" id="nextBtn" onclick="rate(0)">Next</button>`;
   }
 
@@ -932,6 +955,16 @@ function escHtml(s) {
   d.textContent = s;
   return d.innerHTML;
 }
+
+function speakDe(text) {
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'de-DE';
+  u.rate = 0.85;
+  window.speechSynthesis.speak(u);
+}
+
+const speakIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>`;
 
 // ===== WORDS LIST =====
 function addWord() {
