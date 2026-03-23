@@ -480,6 +480,41 @@
   .modal-cancel { background: var(--surface2); color: var(--text); }
   .modal-confirm { background: var(--red); color: #fff; }
 
+  /* ---- GENDER COLORS ---- */
+  .gender-der { color: #4a9eff; }
+  .gender-die { color: #ff453a; }
+  .gender-das { color: #34c759; }
+  .gender-none { color: var(--text); }
+
+  .gender-picker {
+    display: flex;
+    gap: 8px;
+  }
+  .gender-btn {
+    flex: 1;
+    padding: 10px 4px;
+    border: 2px solid #333;
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text2);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  .gender-btn.sel-der { border-color: #4a9eff; color: #4a9eff; background: #4a9eff15; }
+  .gender-btn.sel-die { border-color: #ff453a; color: #ff453a; background: #ff453a15; }
+  .gender-btn.sel-das { border-color: #34c759; color: #34c759; background: #34c75915; }
+  .gender-btn.sel-none { border-color: #666; color: var(--text); background: var(--surface2); }
+
+  .word-item-gender {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    margin-right: 4px;
+  }
+
   /* file input hidden */
   #importFile { display: none; }
 </style>
@@ -498,6 +533,12 @@
     <div class="input-row">
       <input type="text" id="inputDe" placeholder="German" autocomplete="off" autocapitalize="none" spellcheck="false">
       <input type="text" id="inputEn" placeholder="English" autocomplete="off" autocapitalize="none" spellcheck="false">
+    </div>
+    <div class="gender-picker" id="genderPicker">
+      <button class="gender-btn" onclick="pickGender('der')" id="gBtn-der">der</button>
+      <button class="gender-btn" onclick="pickGender('die')" id="gBtn-die">die</button>
+      <button class="gender-btn" onclick="pickGender('das')" id="gBtn-das">das</button>
+      <button class="gender-btn" onclick="pickGender('none')" id="gBtn-none">–</button>
     </div>
     <button class="add-btn" onclick="addWord()">Add Word</button>
   </div>
@@ -622,17 +663,51 @@ function today() {
   return Math.floor(Date.now() / 86400000);
 }
 
-function createCard(de, en) {
+function createCard(de, en, gender) {
   return {
     id: Date.now() + Math.random(),
     de: de.trim(),
     en: en.trim(),
+    gender: gender || 'none',
     ease: 2.5,
     interval: 0,
     repetitions: 0,
     nextReview: today(),
     lastReview: 0
   };
+}
+
+let selectedGender = 'none';
+
+function pickGender(g) {
+  selectedGender = g;
+  ['der','die','das','none'].forEach(x => {
+    document.getElementById('gBtn-' + x).className = 'gender-btn' + (x === g ? ' sel-' + x : '');
+  });
+}
+
+function genderColor(g) {
+  if (g === 'der') return '#4a9eff';
+  if (g === 'die') return '#ff453a';
+  if (g === 'das') return '#34c759';
+  return '';
+}
+
+function genderClass(g) {
+  if (g === 'der') return 'gender-der';
+  if (g === 'die') return 'gender-die';
+  if (g === 'das') return 'gender-das';
+  return 'gender-none';
+}
+
+function coloredDe(card) {
+  const g = card.gender || 'none';
+  const color = genderColor(g);
+  const prefix = g !== 'none' ? g + ' ' : '';
+  if (color) {
+    return `<span style="color:${color}">${escHtml(prefix + card.de)}</span>`;
+  }
+  return escHtml(card.de);
 }
 
 function reviewCard(card, quality) {
@@ -851,9 +926,9 @@ function showNextCard() {
     // FLIP MODE: de2en or en2de_flip
     const showDeFront = reviewMode === 'de2en';
     const frontLang = showDeFront ? 'Deutsch' : 'English';
-    const frontWord = showDeFront ? currentCard.de : currentCard.en;
+    const frontWordHtml = showDeFront ? coloredDe(currentCard) : escHtml(currentCard.en);
     const backLang = showDeFront ? 'English' : 'Deutsch';
-    const backWord = showDeFront ? currentCard.en : currentCard.de;
+    const backWordHtml = showDeFront ? escHtml(currentCard.en) : coloredDe(currentCard);
 
     const deOnFront = showDeFront;
     const frontSpeak = deOnFront
@@ -869,13 +944,13 @@ function showNextCard() {
         <div class="card-inner" id="cardInner">
           <div class="card-front">
             <div class="card-lang">${frontLang}</div>
-            <div class="card-word">${escHtml(frontWord)}</div>
+            <div class="card-word">${frontWordHtml}</div>
             ${frontSpeak}
             <div class="card-hint">tap to flip</div>
           </div>
           <div class="card-back">
             <div class="card-lang">${backLang}</div>
-            <div class="card-word">${escHtml(backWord)}</div>
+            <div class="card-word">${backWordHtml}</div>
             ${backSpeak}
             <div class="card-hint">tap to flip back</div>
           </div>
@@ -913,16 +988,17 @@ function checkAnswer() {
   const ratingDiv = document.getElementById('typeRating');
 
   const speakBtn = `<button class="speak-btn" style="display:inline-block;margin-top:8px" onclick="speakDe('${currentCard.de.replace(/'/g, "\\'")}')">${speakIcon}</button>`;
+  const coloredAnswer = coloredDe(currentCard);
 
   if (isCorrect) {
     inp.classList.add('correct');
-    resultDiv.innerHTML = `<div class="correct-word">${escHtml(currentCard.de)}</div>${speakBtn}`;
+    resultDiv.innerHTML = `<div class="correct-word">${coloredAnswer}</div>${speakBtn}`;
     ratingDiv.innerHTML = `<button class="next-btn" id="nextBtn" onclick="rate(2)">Next</button>`;
   } else {
     inp.classList.add('wrong');
     resultDiv.innerHTML = `
       <div class="wrong-label">Correct answer:</div>
-      <div class="correct-word">${escHtml(currentCard.de)}</div>${speakBtn}`;
+      <div class="correct-word">${coloredAnswer}</div>${speakBtn}`;
     ratingDiv.innerHTML = `<button class="next-btn" id="nextBtn" onclick="rate(0)">Next</button>`;
   }
 
@@ -972,12 +1048,13 @@ function addWord() {
   const en = document.getElementById('inputEn').value.trim();
   if (!de || !en) return;
 
-  words.push(createCard(de, en));
+  words.push(createCard(de, en, selectedGender));
   save();
 
   document.getElementById('inputDe').value = '';
   document.getElementById('inputEn').value = '';
   document.getElementById('inputDe').focus();
+  pickGender('none');
 
   renderWordList();
   buildReviewQueue();
@@ -1009,9 +1086,14 @@ function renderWordList() {
     else if (w.interval < 7) status = `<span class="learning">Learning</span>`;
     else status = `<span class="known">Known (${w.interval}d)</span>`;
 
+    const g = w.gender || 'none';
+    const gColor = genderColor(g);
+    const gPrefix = g !== 'none' ? `<span class="word-item-gender" style="color:${gColor}">${g}</span>` : '';
+    const deStyle = gColor ? ` style="color:${gColor}"` : '';
+
     return `<div class="word-item">
       <div class="word-item-text">
-        <div class="word-item-de">${escHtml(w.de)}</div>
+        <div class="word-item-de"${deStyle}>${gPrefix}${escHtml(w.de)}</div>
         <div class="word-item-en">${escHtml(w.en)}</div>
         <div class="word-item-streak">${status}</div>
       </div>

@@ -1,0 +1,148 @@
+{
+  "words": [
+    {
+      "id": 1773609171185.4607,
+      "de": "die Gelegenheit",
+      "en": "Opportunity",
+      "ease": 1.38,
+      "interval": 0,
+      "repetitions": 0,
+      "nextReview": 20529,
+      "lastReview": 20529
+    },
+    {
+      "id": 1773609193913.8813,
+      "de": "das Zeichen",
+      "en": "sign",
+      "ease": 1.3800000000000001,
+      "interval": 0,
+      "repetitions": 0,
+      "nextReview": 20529,
+      "lastReview": 20528
+    },
+    {
+      "id": 1773609203818.608,
+      "de": "der beweis",
+      "en": "proof",
+      "ease": 1.38,
+      "interval": 0,
+      "repetitions": 0,
+      "nextReview": 20529,
+      "lastReview": 20529
+    },
+    {
+      "id": 1773609233781.0012,
+      "de": "das zeil",
+      "en": "goal",
+      "ease": 2.5,
+      "interval": 3,
+      "repetitions": 2,
+      "nextReview": 20532,
+      "lastReview": 20529
+    },
+    {
+      "id": 1773609250903.2837,
+      "de": "der Stolz",
+      "en": "Pride",
+      "ease": 1.38,
+      "interval": 0,
+      "repetitions": 0,
+      "nextReview": 20529,
+      "lastReview": 20529
+    },
+    {
+      "id": 1773610145355.897,
+      "de": "genial",
+      "en": "brillant",
+      "ease": 1.3,
+      "interval": 0,
+      "repetitions": 0,
+      "nextReview": 20529,
+      "lastReview": 20529
+    },
+    {
+      "id": 1773610360417.149,
+      "de": "Erzählen",
+      "en": "tell",
+      "ease": 1.7000000000000002,
+      "interval": 0,
+      "repetitions": 0,
+      "nextReview": 20529,
+      "lastReview": 20529
+    },
+    {
+      "id": 1773692499955.6926,
+      "de": "teilen",
+      "en": "Share/split",
+      "ease": 1.7000000000000002,
+      "interval": 0,
+      "repetitions": 0,
+      "nextReview": 20529,
+      "lastReview": 20529
+    },
+    {
+      "id": 1773692568830.5713,
+      "de": "anfangen",
+      "en": "begin",
+      "ease": 1.7000000000000002,
+      "interval": 0,
+      "repetitions": 0,
+      "nextReview": 20529,
+      "lastReview": 20529
+    },
+    {
+      "id": 1773692731542.691,
+      "de": "versuchen",
+      "en": "attempt",
+      "ease": 2.5,
+      "interval": 0,
+      "repetitions": 0,
+      "nextReview": 20528,
+      "lastReview": 0
+    },
+    {
+      "id": 1773692953199.9792,
+      "de": "angenommen",
+      "en": "to be received/accepted",
+      "ease": 1.7000000000000002,
+      "interval": 0,
+      "repetitions": 0,
+      "nextReview": 20529,
+      "lastReview": 20529
+    },
+    {
+      "id": 1773693014131.575,
+      "de": "vom letztem Tag",
+      "en": "from yesterday",
+      "ease": 1.7000000000000002,
+      "interval": 0,
+      "repetitions": 0,
+      "nextReview": 20529,
+      "lastReview": 20529
+    },
+    {
+      "id": 1773736493062.87,
+      "de": "schrecklich",
+      "en": "awful",
+      "ease": 2.5,
+      "interval": 0,
+      "repetitions": 0,
+      "nextReview": 20529,
+      "lastReview": 0
+    },
+    {
+      "id": 1774213734538.7024,
+      "de": "beschäftigt",
+      "en": "busy",
+      "ease": 2.5,
+      "interval": 0,
+      "repetitions": 0,
+      "nextReview": 20534,
+      "lastReview": 0
+    }
+  ],
+  "settings": {
+    "newCardsLimit": 999
+  },
+  "exportDate": "2026-03-23T07:09:15.531Z"
+}
