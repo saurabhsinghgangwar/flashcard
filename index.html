@@ -515,6 +515,252 @@
     margin-right: 4px;
   }
 
+  /* ---- NOTES SCREEN ---- */
+  .notes-search {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid #333;
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 15px;
+    outline: none;
+    margin-bottom: 12px;
+  }
+  .notes-search:focus { border-color: var(--accent); }
+  .notes-search::placeholder { color: #555; }
+
+  .notes-add-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 16px;
+    transition: opacity 0.2s;
+  }
+  .notes-add-btn:active { opacity: 0.8; }
+
+  .note-count {
+    font-size: 13px;
+    color: var(--text2);
+    margin-bottom: 12px;
+  }
+
+  .notes-list { display: flex; flex-direction: column; gap: 10px; }
+  .note-card {
+    padding: 16px;
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid #333;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .note-card:active { border-color: var(--accent); }
+  .note-card-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .note-card-category {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-dim);
+    padding: 2px 8px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+  }
+  .note-card-preview {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Note viewer */
+  #notesContent {
+    width: 100%;
+    max-width: 700px;
+  }
+  .note-viewer {
+  }
+  .note-viewer-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .note-back-btn {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 16px;
+    padding: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: auto;
+  }
+  .note-viewer-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .note-viewer-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .note-action-btn {
+    background: var(--surface2);
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: var(--text);
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .note-action-btn.danger { color: var(--red); border-color: var(--red); }
+  .note-viewer-category {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-dim);
+    padding: 3px 10px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+  }
+  .note-viewer-content {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+    word-wrap: break-word;
+  }
+
+  /* Note editor modal */
+  .note-editor-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 300;
+    flex-direction: column;
+    padding: calc(var(--safe-top) + 12px) 20px calc(20px + var(--safe-bottom));
+  }
+  .note-editor-overlay.show { display: flex; }
+  .note-editor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .note-editor-header h2 { font-size: 20px; font-weight: 700; }
+  .note-editor-cancel {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 8px;
+  }
+  .note-editor-save {
+    padding: 8px 20px;
+    background: var(--accent);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .note-editor-field {
+    margin-bottom: 12px;
+  }
+  .note-editor-field label {
+    display: block;
+    font-size: 13px;
+    color: var(--text2);
+    margin-bottom: 6px;
+  }
+  .note-editor-field input,
+  .note-editor-field textarea {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 1px solid #333;
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 15px;
+    outline: none;
+    font-family: inherit;
+  }
+  .note-editor-field input:focus,
+  .note-editor-field textarea:focus { border-color: var(--accent); }
+  .note-editor-field textarea {
+    flex: 1;
+    min-height: 200px;
+    resize: none;
+    line-height: 1.6;
+  }
+  .note-editor-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+  }
+  .note-editor-body .note-editor-field:last-child {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Note tables */
+  .note-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 10px 0;
+  }
+  .note-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    min-width: 280px;
+  }
+  .note-table th, .note-table td {
+    padding: 8px 10px;
+    border: 1px solid #333;
+    text-align: left;
+  }
+  .note-table th {
+    background: var(--surface2);
+    font-weight: 600;
+    color: var(--text);
+  }
+  .note-table tr:nth-child(even) td { background: #1e1e1e; }
+
+  /* Note lists */
+  .note-list {
+    padding-left: 20px;
+    margin: 6px 0;
+  }
+  .note-list li {
+    padding: 3px 0;
+    line-height: 1.6;
+  }
+
+  .note-viewer-content strong { color: var(--text); }
+
   /* file input hidden */
   #importFile { display: none; }
 </style>
@@ -547,6 +793,40 @@
   <div class="word-list" id="wordList"></div>
 </div>
 
+<!-- ===== NOTES SCREEN ===== -->
+<div class="screen" id="screenNotes">
+  <div id="notesContent">
+    <h1 class="screen-title">Notes</h1>
+    <button class="notes-add-btn" onclick="openNoteEditor()">+ Add Note</button>
+    <input type="text" class="notes-search" id="notesSearch" placeholder="Search notes..." oninput="renderNotesList()">
+    <div class="note-count" id="noteCount"></div>
+    <div class="notes-list" id="notesList"></div>
+  </div>
+</div>
+
+<!-- ===== NOTE EDITOR ===== -->
+<div class="note-editor-overlay" id="noteEditorOverlay">
+  <div class="note-editor-header">
+    <button class="note-editor-cancel" onclick="closeNoteEditor()">Cancel</button>
+    <h2 id="noteEditorTitle">New Note</h2>
+    <button class="note-editor-save" onclick="saveNote()">Save</button>
+  </div>
+  <div class="note-editor-body">
+    <div class="note-editor-field">
+      <label>Title</label>
+      <input type="text" id="noteInputTitle" placeholder="e.g. Dative Prepositions" autocomplete="off">
+    </div>
+    <div class="note-editor-field">
+      <label>Category</label>
+      <input type="text" id="noteInputCategory" placeholder="e.g. Grammar, Vocabulary, Verbs" autocomplete="off">
+    </div>
+    <div class="note-editor-field">
+      <label>Content (paste from Claude or type)</label>
+      <textarea id="noteInputContent" placeholder="Paste your notes here..."></textarea>
+    </div>
+  </div>
+</div>
+
 <!-- ===== SETTINGS SCREEN ===== -->
 <div class="screen" id="screenSettings">
   <h1 class="screen-title">Settings</h1>
@@ -556,6 +836,7 @@
     <div class="stat-card"><div class="stat-num" id="statDue">0</div><div class="stat-label">Due Today</div></div>
     <div class="stat-card"><div class="stat-num" id="statLearning">0</div><div class="stat-label">Learning</div></div>
     <div class="stat-card"><div class="stat-num" id="statKnown">0</div><div class="stat-label">Known</div></div>
+    <div class="stat-card"><div class="stat-num" id="statNotes">0</div><div class="stat-label">Notes</div></div>
   </div>
 
   <div class="settings-group">
@@ -578,7 +859,7 @@
     <div class="settings-item">
       <div>
         <div class="settings-label">Export Backup</div>
-        <div class="settings-desc">Save all words & progress</div>
+        <div class="settings-desc">Save all words, notes & progress</div>
       </div>
       <button class="settings-btn" onclick="exportData()">Export</button>
     </div>
@@ -596,7 +877,7 @@
     <div class="settings-item">
       <div>
         <div class="settings-label">Delete All Data</div>
-        <div class="settings-desc">Remove all words and progress</div>
+        <div class="settings-desc">Remove all words, notes and progress</div>
       </div>
       <button class="settings-btn danger" onclick="showDeleteModal()">Delete</button>
     </div>
@@ -612,6 +893,10 @@
   <button class="nav-btn" onclick="switchScreen('Words')" id="navWords">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
     <span>Words</span>
+  </button>
+  <button class="nav-btn" onclick="switchScreen('Notes')" id="navNotes">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    <span>Notes</span>
   </button>
   <button class="nav-btn" onclick="switchScreen('Settings')" id="navSettings">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
@@ -634,10 +919,12 @@
 <script>
 // ===== DATA =====
 let words = []; // { id, de, en, ease, interval, repetitions, nextReview, lastReview }
+let notes = []; // { id, title, category, content, createdAt, updatedAt }
 let settings = { newCardsLimit: 10 };
 
 const STORAGE_KEY = 'karteikarten_words';
 const SETTINGS_KEY = 'karteikarten_settings';
+const NOTES_KEY = 'karteikarten_notes';
 
 function load() {
   try {
@@ -645,12 +932,18 @@ function load() {
     if (d) words = JSON.parse(d);
     const s = localStorage.getItem(SETTINGS_KEY);
     if (s) settings = JSON.parse(s);
+    const n = localStorage.getItem(NOTES_KEY);
+    if (n) notes = JSON.parse(n);
   } catch(e) {}
   document.getElementById('newCardsLimit').value = settings.newCardsLimit || 10;
 }
 
 function save() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
+}
+
+function saveNotes() {
+  localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
 }
 
 function saveSettings() {
@@ -1117,11 +1410,12 @@ function updateStats() {
   document.getElementById('statDue').textContent = words.filter(w => w.nextReview <= d).length;
   document.getElementById('statLearning').textContent = words.filter(w => w.repetitions > 0 && w.interval < 7).length;
   document.getElementById('statKnown').textContent = words.filter(w => w.interval >= 7).length;
+  document.getElementById('statNotes').textContent = notes.length;
 }
 
 // ===== EXPORT / IMPORT =====
 function exportData() {
-  const data = { words, settings, exportDate: new Date().toISOString() };
+  const data = { words, notes, settings, exportDate: new Date().toISOString() };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1138,19 +1432,55 @@ function importData(event) {
   reader.onload = function(e) {
     try {
       const data = JSON.parse(e.target.result);
-      if (data.words && Array.isArray(data.words)) {
+
+      // Support full backup (has words) or notes-only JSON
+      const hasWords = data.words && Array.isArray(data.words);
+      const hasNotes = data.notes && Array.isArray(data.notes);
+
+      if (!hasWords && !hasNotes) {
+        alert('Invalid backup file.');
+        return;
+      }
+
+      let msg = [];
+
+      if (hasWords) {
         words = data.words;
-        if (data.settings) settings = data.settings;
         save();
+        msg.push(words.length + ' words');
+      }
+
+      if (hasNotes) {
+        // Merge: add new notes (by id), update existing
+        const existingIds = new Set(notes.map(n => n.id));
+        let added = 0;
+        data.notes.forEach(n => {
+          if (!existingIds.has(n.id)) {
+            notes.push(n);
+            added++;
+          }
+        });
+        saveNotes();
+        msg.push((hasWords ? data.notes.length : added) + ' notes');
+      }
+
+      if (data.settings) {
+        settings = data.settings;
         localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
         document.getElementById('newCardsLimit').value = settings.newCardsLimit || 10;
-        buildReviewQueue();
-        renderWordList();
-        updateStats();
-        switchScreen('Review');
-        alert('Import successful! ' + words.length + ' words loaded.');
+      }
+
+      buildReviewQueue();
+      renderWordList();
+      updateStats();
+
+      if (hasNotes && !hasWords) {
+        // Notes-only import — go to Notes tab
+        switchScreen('Notes');
+        alert('Import successful! Notes added.');
       } else {
-        alert('Invalid backup file.');
+        switchScreen('Review');
+        alert('Import successful! ' + msg.join(', ') + ' loaded.');
       }
     } catch(err) {
       alert('Could not read file.');
@@ -1165,12 +1495,275 @@ function showDeleteModal() { document.getElementById('deleteModal').classList.ad
 function hideDeleteModal() { document.getElementById('deleteModal').classList.remove('show'); }
 function deleteAll() {
   words = [];
+  notes = [];
   save();
+  saveNotes();
   hideDeleteModal();
   buildReviewQueue();
   renderWordList();
   updateStats();
   switchScreen('Review');
+}
+
+// ===== NOTES =====
+let editingNoteId = null;
+
+function createNote(title, category, content) {
+  return {
+    id: Date.now() + Math.random(),
+    title: title.trim(),
+    category: (category || '').trim(),
+    content: content.trim(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+}
+
+function renderNotesList() {
+  const search = (document.getElementById('notesSearch')?.value || '').toLowerCase();
+  const filtered = notes.filter(n =>
+    n.title.toLowerCase().includes(search) ||
+    (n.category || '').toLowerCase().includes(search) ||
+    n.content.toLowerCase().includes(search)
+  );
+
+  document.getElementById('noteCount').textContent = `${notes.length} note${notes.length !== 1 ? 's' : ''}`;
+
+  const sorted = [...filtered].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  const list = document.getElementById('notesList');
+
+  if (sorted.length === 0 && notes.length === 0) {
+    list.innerHTML = `<div class="empty-state">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <p>No notes yet.<br>Tap <strong>+ Add Note</strong> or ask Claude for notes and <strong>import the JSON</strong>.</p>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = sorted.map(n => {
+    const cat = n.category ? `<div class="note-card-category">${escHtml(n.category)}</div>` : '';
+    const preview = cleanPreview(n.content);
+    return `<div class="note-card" onclick="viewNote(${n.id})">
+      ${cat}
+      <div class="note-card-title">${escHtml(n.title)}</div>
+      <div class="note-card-preview">${escHtml(preview)}</div>
+    </div>`;
+  }).join('');
+}
+
+function viewNote(id) {
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+
+  const container = document.getElementById('notesContent');
+  const cat = note.category ? `<div class="note-viewer-category">${escHtml(note.category)}</div>` : '';
+
+  container.innerHTML = `
+    <div class="note-viewer">
+      <div class="note-viewer-header">
+        <button class="note-back-btn" onclick="showNotesList()">&#8592; Back</button>
+        <div class="note-viewer-actions">
+          <button class="note-action-btn" onclick="editNote(${note.id})">Edit</button>
+          <button class="note-action-btn danger" onclick="deleteNote(${note.id})">Delete</button>
+        </div>
+      </div>
+      <div class="note-viewer-title">${escHtml(note.title)}</div>
+      ${cat}
+      <div class="note-viewer-content">${formatNoteContent(note.content)}</div>
+    </div>`;
+}
+
+function formatNoteContent(text) {
+  try { return _renderNote(text); } catch(e) { return escHtml(text).replace(/\n/g, '<br>'); }
+}
+function _renderNote(rawText) {
+  // Strip first line if it's a # heading (already shown as note title)
+  let text = rawText.trim();
+  const firstLine = text.split('\n')[0];
+  if (/^#\s/.test(firstLine)) {
+    text = text.substring(firstLine.length);
+  }
+  text = text.replace(/^\n+/, ''); // remove leading blank lines
+  const lines = text.split('\n');
+  let html = '';
+  let inTable = false;
+  let inList = false;
+  let listType = '';
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+
+    // Table separator row (---|---|---) — skip
+    if (/^\s*\|?\s*[-:]+[-|:\s]+$/.test(line)) continue;
+
+    // Table row (starts with |)
+    if (/\|/.test(line) && line.trim().startsWith('|')) {
+      if (!inTable) {
+        if (inList) { html += listType === 'ul' ? '</ul>' : '</ol>'; inList = false; }
+        html += '<div class="note-table-wrap"><table class="note-table">';
+        inTable = true;
+        const nextLine = lines[i + 1] || '';
+        const isHeader = /^\s*\|?\s*[-:]+[-|:\s]+$/.test(nextLine);
+        const cells = line.split('|').filter(c => c.trim() !== '');
+        const tag = isHeader ? 'th' : 'td';
+        html += '<tr>' + cells.map(c => `<${tag}>${fmtInline(c.trim())}</${tag}>`).join('') + '</tr>';
+        continue;
+      }
+      const cells = line.split('|').filter(c => c.trim() !== '');
+      html += '<tr>' + cells.map(c => `<td>${fmtInline(c.trim())}</td>`).join('') + '</tr>';
+      continue;
+    } else if (inTable) { html += '</table></div>'; inTable = false; }
+
+    // Headings
+    if (/^#{1,3}\s/.test(line)) {
+      if (inList) { html += listType === 'ul' ? '</ul>' : '</ol>'; inList = false; }
+      const lvl = line.match(/^(#{1,3})/)[1].length;
+      const txt = line.replace(/^#{1,3}\s+/, '');
+      const sz = { 1: '20px', 2: '17px', 3: '15px' };
+      html += `<div style="font-size:${sz[lvl]};font-weight:700;margin:16px 0 8px;color:var(--text)">${fmtInline(txt)}</div>`;
+      continue;
+    }
+
+    // Unordered list
+    if (/^\s*[-•*]\s/.test(line)) {
+      if (!inList || listType !== 'ul') {
+        if (inList) html += listType === 'ul' ? '</ul>' : '</ol>';
+        html += '<ul class="note-list">'; inList = true; listType = 'ul';
+      }
+      html += `<li>${fmtInline(line.replace(/^\s*[-•*]\s+/, ''))}</li>`;
+      continue;
+    }
+
+    // Ordered list
+    if (/^\s*\d+\.\s/.test(line)) {
+      if (!inList || listType !== 'ol') {
+        if (inList) html += listType === 'ul' ? '</ul>' : '</ol>';
+        html += '<ol class="note-list">'; inList = true; listType = 'ol';
+      }
+      html += `<li>${fmtInline(line.replace(/^\s*\d+\.\s+/, ''))}</li>`;
+      continue;
+    }
+
+    if (inList) { html += listType === 'ul' ? '</ul>' : '</ol>'; inList = false; }
+
+    if (line.trim() === '') { html += '<div style="height:8px"></div>'; continue; }
+
+    html += `<div>${fmtInline(line)}</div>`;
+  }
+
+  if (inTable) html += '</table></div>';
+  if (inList) html += listType === 'ul' ? '</ul>' : '</ol>';
+  return html;
+}
+
+function fmtInline(text) {
+  try {
+    let s = escHtml(text);
+    // Bold: **text** (no color, just bold)
+    s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    // Inline code: `text`
+    s = s.replace(/`(.+?)`/g, '<code style="background:#2a2a2a;padding:1px 5px;border-radius:4px;font-size:13px">$1</code>');
+    // Strip all {{tags}} — just show the text inside
+    s = s.replace(/\{\{[a-z]+[ :](.*?)\}\}/g, '$1');
+    s = s.replace(/\{\{(.*?)\}\}/g, '$1');
+    // Arrow: -> to →
+    s = s.replace(/-&gt;/g, '→');
+    return s;
+  } catch(e) {
+    return escHtml(text);
+  }
+}
+
+function cleanPreview(content) {
+  let s = content;
+  s = s.replace(/^#{1,3}\s+/gm, '');
+  s = s.replace(/\{\{[a-z]+[ :](.*?)\}\}/g, '$1');
+  s = s.replace(/\{\{(.*?)\}\}/g, '$1');
+  s = s.replace(/\*\*(.+?)\*\*/g, '$1');
+  s = s.replace(/\|[-:\s|]+\|/g, '');
+  s = s.replace(/\|/g, ' · ');
+  s = s.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+  return s.slice(0, 120);
+}
+
+function showNotesList() {
+  const container = document.getElementById('notesContent');
+  container.innerHTML = `
+    <h1 class="screen-title">Notes</h1>
+    <button class="notes-add-btn" onclick="openNoteEditor()">+ Add Note</button>
+    <input type="text" class="notes-search" id="notesSearch" placeholder="Search notes..." oninput="renderNotesList()">
+    <div class="note-count" id="noteCount"></div>
+    <div class="notes-list" id="notesList"></div>`;
+  renderNotesList();
+}
+
+function openNoteEditor(noteId) {
+  editingNoteId = noteId || null;
+  const overlay = document.getElementById('noteEditorOverlay');
+  const title = document.getElementById('noteEditorTitle');
+  const inputTitle = document.getElementById('noteInputTitle');
+  const inputCat = document.getElementById('noteInputCategory');
+  const inputContent = document.getElementById('noteInputContent');
+
+  if (noteId) {
+    const note = notes.find(n => n.id === noteId);
+    if (!note) return;
+    title.textContent = 'Edit Note';
+    inputTitle.value = note.title;
+    inputCat.value = note.category || '';
+    inputContent.value = note.content;
+  } else {
+    title.textContent = 'New Note';
+    inputTitle.value = '';
+    inputCat.value = '';
+    inputContent.value = '';
+  }
+
+  overlay.classList.add('show');
+  inputTitle.focus();
+}
+
+function closeNoteEditor() {
+  document.getElementById('noteEditorOverlay').classList.remove('show');
+  editingNoteId = null;
+}
+
+function saveNote() {
+  const title = document.getElementById('noteInputTitle').value.trim();
+  const category = document.getElementById('noteInputCategory').value.trim();
+  const content = document.getElementById('noteInputContent').value.trim();
+
+  if (!title || !content) {
+    alert('Please add a title and content.');
+    return;
+  }
+
+  if (editingNoteId) {
+    const note = notes.find(n => n.id === editingNoteId);
+    if (note) {
+      note.title = title;
+      note.category = category;
+      note.content = content;
+      note.updatedAt = new Date().toISOString();
+    }
+  } else {
+    notes.push(createNote(title, category, content));
+  }
+
+  saveNotes();
+  closeNoteEditor();
+  showNotesList();
+}
+
+function editNote(id) {
+  openNoteEditor(id);
+}
+
+function deleteNote(id) {
+  if (!confirm('Delete this note?')) return;
+  notes = notes.filter(n => n.id !== id);
+  saveNotes();
+  showNotesList();
 }
 
 // ===== NAVIGATION =====
@@ -1180,10 +1773,9 @@ function switchScreen(name) {
   document.getElementById('screen' + name).classList.add('active');
   document.getElementById('nav' + name).classList.add('active');
 
-  if (name === 'Review') {
-    showModePicker();
-  }
+  if (name === 'Review') showModePicker();
   if (name === 'Words') renderWordList();
+  if (name === 'Notes') showNotesList();
   if (name === 'Settings') updateStats();
 }
 
