@@ -835,7 +835,7 @@
       <div><div class="settings-label">Backup</div></div>
       <div style="display:flex;gap:8px">
         <button class="settings-btn" onclick="exportData()">Download</button>
-        <button class="settings-btn" onclick="emailBackup()">Email</button>
+        <button class="settings-btn" onclick="shareBackup()">Share</button>
         <button class="settings-btn" onclick="document.getElementById('importFile').click()">Import</button>
       </div>
       <input type="file" id="importFile" accept=".json" onchange="importData(event)">
@@ -1389,25 +1389,26 @@ function exportData() {
   URL.revokeObjectURL(url);
 }
 
-function emailBackup() {
+function shareBackup() {
   const data = { words, notes, settings, exportDate: new Date().toISOString() };
   const json = JSON.stringify(data, null, 2);
   const file = new File([json], 'Karteikarten Backup.json', { type: 'application/json' });
 
-  // Use native share sheet (iOS/Android) — pick Mail, WhatsApp, etc.
-  if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+  if (navigator.share) {
+    // Try sharing with file first, then without
+    const shareData = { title: 'Karteikarten Backup', files: [file] };
+    if (navigator.canShare && navigator.canShare(shareData)) {
+      navigator.share(shareData).catch(function() {});
+      return;
+    }
+    // Share without file (desktop Chrome)
     navigator.share({
       title: 'Karteikarten Backup',
-      text: 'Karteikarten backup — ' + words.length + ' words, ' + notes.length + ' notes',
-      files: [file]
-    }).catch(function() {});
+      text: json
+    }).catch(function() { exportData(); });
   } else {
-    // Desktop fallback: download the file + open mailto
+    // No share API at all — just download
     exportData();
-    const summary = words.length + ' words, ' + notes.length + ' notes';
-    const subject = encodeURIComponent('Karteikarten Backup');
-    const body = encodeURIComponent('Backup: ' + summary + '\n\nAttach the downloaded JSON file to this email.');
-    window.open('mailto:?subject=' + subject + '&body=' + body, '_self');
   }
 }
 
