@@ -833,9 +833,9 @@
   <div class="settings-group">
     <div class="settings-item">
       <div><div class="settings-label">Backup</div></div>
-      <div style="display:flex;gap:8px">
+      <div style="display:flex;gap:8px" id="backupButtons">
         <button class="settings-btn" onclick="exportData()">Download</button>
-        <button class="settings-btn" onclick="shareBackup()">Share</button>
+        <button class="settings-btn" id="shareBtnMobile" onclick="shareBackup()" style="display:none">Share</button>
         <button class="settings-btn" onclick="document.getElementById('importFile').click()">Import</button>
       </div>
       <input type="file" id="importFile" accept=".json" onchange="importData(event)">
@@ -1407,7 +1407,7 @@ function shareBackup() {
       var json = JSON.stringify(data, null, 2);
       var file = new File([json], 'Karteikarten Backup.json', { type: 'application/json' });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({ title: 'Karteikarten Backup', files: [file] }).catch(function() {});
+        navigator.share({ files: [file] }).catch(function() {});
       } else {
         exportData();
       }
@@ -1777,6 +1777,10 @@ function switchScreen(name) {
 load();
 showModePicker();
 updateStats();
+if (/iPhone|iPad|Android/i.test(navigator.userAgent)) {
+  var shareBtn = document.getElementById('shareBtnMobile');
+  if (shareBtn) shareBtn.style.display = '';
+}
 </script>
 <script data-goatcounter="https://saurabh.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
