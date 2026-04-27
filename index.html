@@ -1237,8 +1237,9 @@ function checkAnswer() {
   if (!answer) return;
 
   function normalize(s) { return s.toLowerCase().replace(/[\s ​]+/g, ' ').trim(); }
-  const correct = normalize(currentCard.de);
-  const given = normalize(answer);
+  function norm(s) { return s.normalize('NFC').toLowerCase().replace(/\s+/g, ' ').trim(); }
+  const correct = norm(currentCard.de);
+  const given = norm(answer);
   const isCorrect = given === correct;
 
   inp.disabled = true;
