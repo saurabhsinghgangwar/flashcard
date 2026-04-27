@@ -858,13 +858,24 @@
   <div class="settings-group">
     <div class="settings-item">
       <div>
-        <div class="settings-label">Backup</div>
-        <div class="settings-desc">Save or restore words, notes & progress</div>
+        <div class="settings-label">Save Locally</div>
+        <div class="settings-desc">Download backup to this device</div>
       </div>
-      <div style="display:flex;gap:8px">
-        <button class="settings-btn" onclick="exportData()">Export</button>
-        <button class="settings-btn" onclick="document.getElementById('importFile').click()">Import</button>
+      <button class="settings-btn" onclick="exportData()">Download</button>
+    </div>
+    <div class="settings-item">
+      <div>
+        <div class="settings-label">Email Backup</div>
+        <div class="settings-desc">Send to your email for cross-device use</div>
       </div>
+      <button class="settings-btn" onclick="emailBackup()">Email</button>
+    </div>
+    <div class="settings-item">
+      <div>
+        <div class="settings-label">Import Backup</div>
+        <div class="settings-desc">Restore from a backup file</div>
+      </div>
+      <button class="settings-btn" onclick="document.getElementById('importFile').click()">Import</button>
       <input type="file" id="importFile" accept=".json" onchange="importData(event)">
     </div>
   </div>
@@ -1419,6 +1430,30 @@ function exportData() {
   a.download = `karteikarten-backup-${new Date().toISOString().slice(0,10)}.json`;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+function emailBackup() {
+  const data = { words, notes, settings, exportDate: new Date().toISOString() };
+  const json = JSON.stringify(data, null, 2);
+  const file = new File([json], 'Karteikarten Backup.json', { type: 'application/json' });
+
+  // Use native share sheet (iOS/Android) — pick Mail, WhatsApp, etc.
+  if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+    navigator.share({
+      title: 'Karteikarten Backup',
+      text: 'Karteikarten backup — ' + words.length + ' words, ' + notes.length + ' notes',
+      files: [file]
+    }).catch(function() {});
+  } else {
+    // Fallback: mailto with summary + copy JSON to clipboard
+    const summary = words.length + ' words, ' + notes.length + ' notes';
+    navigator.clipboard.writeText(json).then(function() {
+      alert('JSON copied to clipboard! Paste it in an email to yourself.\n\n' + summary);
+    }).catch(function() {
+      // Last fallback: download instead
+      exportData();
+    });
+  }
 }
 
 function importData(event) {
