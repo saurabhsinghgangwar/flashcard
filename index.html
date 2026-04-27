@@ -1386,7 +1386,7 @@ function exportData() {
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     a.href = url;
-    a.download = 'karteikarten-backup-' + new Date().toISOString().slice(0,10) + '.json';
+    a.download = 'karteikarten-backup.json';
     a.style.display = 'none';
     document.body.appendChild(a);
     a.click();
@@ -1405,7 +1405,7 @@ function shareBackup() {
     if (isMobile && navigator.share) {
       var data = { words: words, notes: notes, settings: settings, exportDate: new Date().toISOString() };
       var json = JSON.stringify(data, null, 2);
-      var file = new File([json], 'Karteikarten Backup.json', { type: 'application/json' });
+      var file = new File([json], 'karteikarten-backup.json', { type: 'application/json' });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         navigator.share({ files: [file] }).catch(function() {});
       } else {
