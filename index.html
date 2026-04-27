@@ -1390,24 +1390,28 @@ function exportData() {
 }
 
 function shareBackup() {
-  const data = { words, notes, settings, exportDate: new Date().toISOString() };
-  const json = JSON.stringify(data, null, 2);
-  const file = new File([json], 'Karteikarten Backup.json', { type: 'application/json' });
+  try {
+    const data = { words, notes, settings, exportDate: new Date().toISOString() };
+    const json = JSON.stringify(data, null, 2);
+    const file = new File([json], 'Karteikarten Backup.json', { type: 'application/json' });
 
-  // Mobile: use native share sheet
-  if (navigator.share && navigator.canShare) {
-    const shareData = { title: 'Karteikarten Backup', files: [file] };
-    if (navigator.canShare(shareData)) {
-      navigator.share(shareData).catch(function() {});
-      return;
-    }
+    // Mobile: use native share sheet
+    try {
+      if (navigator.share && navigator.canShare) {
+        const shareData = { title: 'Karteikarten Backup', files: [file] };
+        if (navigator.canShare(shareData)) {
+          navigator.share(shareData).catch(function() {});
+          return;
+        }
+      }
+    } catch(e) {}
+
+    // Desktop fallback: just download the file
+    exportData();
+    alert('Backup downloaded! Upload it to Google Drive to sync across devices.');
+  } catch(e) {
+    alert('Error: ' + e.message);
   }
-
-  // Desktop: download + open Google Drive upload page
-  exportData();
-  setTimeout(function() {
-    window.open('https://drive.google.com/drive/my-drive', '_blank');
-  }, 500);
 }
 
 function importData(event) {
