@@ -1394,22 +1394,20 @@ function shareBackup() {
   const json = JSON.stringify(data, null, 2);
   const file = new File([json], 'Karteikarten Backup.json', { type: 'application/json' });
 
-  if (navigator.share) {
-    // Try sharing with file first, then without
+  // Mobile: use native share sheet
+  if (navigator.share && navigator.canShare) {
     const shareData = { title: 'Karteikarten Backup', files: [file] };
-    if (navigator.canShare && navigator.canShare(shareData)) {
+    if (navigator.canShare(shareData)) {
       navigator.share(shareData).catch(function() {});
       return;
     }
-    // Share without file (desktop Chrome)
-    navigator.share({
-      title: 'Karteikarten Backup',
-      text: json
-    }).catch(function() { exportData(); });
-  } else {
-    // No share API at all — just download
-    exportData();
   }
+
+  // Desktop: download + open Google Drive upload page
+  exportData();
+  setTimeout(function() {
+    window.open('https://drive.google.com/drive/my-drive', '_blank');
+  }, 500);
 }
 
 function importData(event) {
