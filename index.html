@@ -1238,12 +1238,11 @@ function checkAnswer() {
 
   function normalize(s) { return s.toLowerCase().replace(/[\s ​]+/g, ' ').trim(); }
   function norm(s) { return s.normalize('NFC').toLowerCase().replace(/\s+/g, ' ').trim(); }
-  var correct = norm(currentCard.de);
+  var g = currentCard.gender && currentCard.gender !== 'none' ? currentCard.gender + ' ' : '';
+  var correctFull = norm(g + currentCard.de);
+  var correctShort = norm(currentCard.de);
   var given = norm(answer);
-  var cc = Array.from(correct).map(function(c){return c.charCodeAt(0)}).join(',');
-  var gc = Array.from(given).map(function(c){return c.charCodeAt(0)}).join(',');
-  alert('YOU: [' + given + '] len=' + given.length + ' codes=' + gc + '\nANS: [' + correct + '] len=' + correct.length + ' codes=' + cc);
-  var isCorrect = given === correct;
+  var isCorrect = given === correctFull || given === correctShort;
 
   inp.disabled = true;
 
