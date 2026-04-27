@@ -431,20 +431,6 @@
   .settings-btn:active { background: #333; }
   .settings-btn.danger { color: var(--red); border-color: var(--red); }
 
-  .stats-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 24px;
-  }
-  .stat-card {
-    background: var(--surface);
-    border-radius: 12px;
-    padding: 16px;
-    text-align: center;
-  }
-  .stat-num { font-size: 28px; font-weight: 700; color: var(--accent); }
-  .stat-label { font-size: 12px; color: var(--text2); margin-top: 4px; }
 
   /* ---- MODAL ---- */
   .modal-overlay {
@@ -831,20 +817,9 @@
 <div class="screen" id="screenSettings">
   <h1 class="screen-title">Settings</h1>
 
-  <div class="stats-grid">
-    <div class="stat-card"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Total Words</div></div>
-    <div class="stat-card"><div class="stat-num" id="statDue">0</div><div class="stat-label">Due Today</div></div>
-    <div class="stat-card"><div class="stat-num" id="statLearning">0</div><div class="stat-label">Learning</div></div>
-    <div class="stat-card"><div class="stat-num" id="statKnown">0</div><div class="stat-label">Known</div></div>
-    <div class="stat-card"><div class="stat-num" id="statNotes">0</div><div class="stat-label">Notes</div></div>
-  </div>
-
   <div class="settings-group">
     <div class="settings-item">
-      <div>
-        <div class="settings-label">New cards per session</div>
-        <div class="settings-desc">How many new cards to introduce</div>
-      </div>
+      <div><div class="settings-label">New cards per session</div></div>
       <select id="newCardsLimit" onchange="saveSettings()" style="background:var(--surface2);color:var(--text);border:1px solid #333;border-radius:8px;padding:8px 12px;font-size:14px;">
         <option value="5">5</option>
         <option value="10" selected>10</option>
@@ -857,25 +832,12 @@
 
   <div class="settings-group">
     <div class="settings-item">
-      <div>
-        <div class="settings-label">Save Locally</div>
-        <div class="settings-desc">Download backup to this device</div>
+      <div><div class="settings-label">Backup</div></div>
+      <div style="display:flex;gap:8px">
+        <button class="settings-btn" onclick="exportData()">Download</button>
+        <button class="settings-btn" onclick="emailBackup()">Email</button>
+        <button class="settings-btn" onclick="document.getElementById('importFile').click()">Import</button>
       </div>
-      <button class="settings-btn" onclick="exportData()">Download</button>
-    </div>
-    <div class="settings-item">
-      <div>
-        <div class="settings-label">Email Backup</div>
-        <div class="settings-desc">Send to your email for cross-device use</div>
-      </div>
-      <button class="settings-btn" onclick="emailBackup()">Email</button>
-    </div>
-    <div class="settings-item">
-      <div>
-        <div class="settings-label">Import Backup</div>
-        <div class="settings-desc">Restore from a backup file</div>
-      </div>
-      <button class="settings-btn" onclick="document.getElementById('importFile').click()">Import</button>
       <input type="file" id="importFile" accept=".json" onchange="importData(event)">
     </div>
   </div>
@@ -1412,12 +1374,7 @@ document.getElementById('inputEn').addEventListener('keydown', e => {
 
 // ===== STATS =====
 function updateStats() {
-  const d = today();
-  document.getElementById('statTotal').textContent = words.length;
-  document.getElementById('statDue').textContent = words.filter(w => w.nextReview <= d).length;
-  document.getElementById('statLearning').textContent = words.filter(w => w.repetitions > 0 && w.interval < 7).length;
-  document.getElementById('statKnown').textContent = words.filter(w => w.interval >= 7).length;
-  document.getElementById('statNotes').textContent = notes.length;
+  // kept for internal use by other functions
 }
 
 // ===== EXPORT / IMPORT =====
@@ -1445,14 +1402,12 @@ function emailBackup() {
       files: [file]
     }).catch(function() {});
   } else {
-    // Fallback: mailto with summary + copy JSON to clipboard
+    // Desktop fallback: download the file + open mailto
+    exportData();
     const summary = words.length + ' words, ' + notes.length + ' notes';
-    navigator.clipboard.writeText(json).then(function() {
-      alert('JSON copied to clipboard! Paste it in an email to yourself.\n\n' + summary);
-    }).catch(function() {
-      // Last fallback: download instead
-      exportData();
-    });
+    const subject = encodeURIComponent('Karteikarten Backup');
+    const body = encodeURIComponent('Backup: ' + summary + '\n\nAttach the downloaded JSON file to this email.');
+    window.open('mailto:?subject=' + subject + '&body=' + body, '_self');
   }
 }
 
