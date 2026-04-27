@@ -1236,8 +1236,9 @@ function checkAnswer() {
   const answer = inp.value.trim();
   if (!answer) return;
 
-  const correct = currentCard.de.trim().toLowerCase();
-  const given = answer.toLowerCase();
+  function normalize(s) { return s.toLowerCase().replace(/[\s ​]+/g, ' ').trim(); }
+  const correct = normalize(currentCard.de);
+  const given = normalize(answer);
   const isCorrect = given === correct;
 
   inp.disabled = true;
