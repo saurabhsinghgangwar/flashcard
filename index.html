@@ -571,6 +571,35 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+  .note-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .note-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+  .note-badge.due { color: var(--green); background: #34c75922; }
+  .note-badge.later { color: var(--text2); background: var(--surface2); }
+  .note-card.dimmed { opacity: 0.5; }
+  .note-review-bar {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #333;
+  }
+  .note-review-btn {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .note-review-btn.again { background: var(--red); color: #fff; }
+  .note-review-btn.got-it { background: var(--green); color: #fff; }
 
   /* Note viewer */
   #notesContent {
@@ -903,6 +932,16 @@ function load() {
     if (s) settings = JSON.parse(s);
     const n = localStorage.getItem(NOTES_KEY);
     if (n) notes = JSON.parse(n);
+    // Migrate old notes: add SM-2 fields if missing
+    notes.forEach(function(note) {
+      if (note.ease === undefined) {
+        note.ease = 2.5;
+        note.interval = 0;
+        note.repetitions = 0;
+        note.nextReview = today();
+        note.lastReview = 0;
+      }
+    });
   } catch(e) {}
   document.getElementById('newCardsLimit').value = settings.newCardsLimit || 10;
 }
@@ -1513,8 +1552,44 @@ function createNote(title, category, content) {
     category: (category || '').trim(),
     content: content.trim(),
     createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
+    ease: 2.5,
+    interval: 0,
+    repetitions: 0,
+    nextReview: today(),
+    lastReview: 0
   };
+}
+
+function reviewNote(note, quality) {
+  // quality: 0 = review again, 1 = got it
+  var q = quality === 0 ? 1 : 4;
+  if (q < 3) {
+    note.repetitions = 0;
+    note.interval = 0;
+  } else {
+    if (note.repetitions === 0) note.interval = 1;
+    else if (note.repetitions === 1) note.interval = 4;
+    else note.interval = Math.round(note.interval * note.ease);
+    note.repetitions++;
+  }
+  note.ease = Math.max(1.3, note.ease + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)));
+  note.nextReview = today() + Math.max(quality === 0 ? 0 : 1, note.interval);
+  note.lastReview = today();
+  saveNotes();
+}
+
+function isNoteDue(note) {
+  if (!note.nextReview && note.nextReview !== 0) return true;
+  return today() >= note.nextReview;
+}
+
+function noteNextReviewLabel(note) {
+  if (!note.nextReview && note.nextReview !== 0) return 'New';
+  var diff = note.nextReview - today();
+  if (diff <= 0) return 'Due';
+  if (diff === 1) return 'Tomorrow';
+  return 'in ' + diff + 'd';
 }
 
 function renderNotesList() {
@@ -1527,8 +1602,19 @@ function renderNotesList() {
 
   document.getElementById('noteCount').textContent = `${notes.length} note${notes.length !== 1 ? 's' : ''}`;
 
-  const sorted = [...filtered].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  // Sort: due notes first, then by next review date
+  const sorted = [...filtered].sort((a, b) => {
+    var aDue = isNoteDue(a) ? 0 : 1;
+    var bDue = isNoteDue(b) ? 0 : 1;
+    if (aDue !== bDue) return aDue - bDue;
+    return (a.nextReview || 0) - (b.nextReview || 0);
+  });
   const list = document.getElementById('notesList');
+
+  var dueCount = notes.filter(n => isNoteDue(n)).length;
+  document.getElementById('noteCount').textContent = dueCount > 0
+    ? dueCount + ' due · ' + notes.length + ' total'
+    : notes.length + ' note' + (notes.length !== 1 ? 's' : '') + ' · all reviewed';
 
   if (sorted.length === 0 && notes.length === 0) {
     list.innerHTML = `<div class="empty-state">
@@ -1541,9 +1627,16 @@ function renderNotesList() {
   list.innerHTML = sorted.map(n => {
     const cat = n.category ? `<div class="note-card-category">${escHtml(n.category)}</div>` : '';
     const preview = cleanPreview(n.content);
-    return `<div class="note-card" onclick="viewNote(${n.id})">
+    var due = isNoteDue(n);
+    var label = noteNextReviewLabel(n);
+    var badgeClass = due ? 'due' : 'later';
+    var dimClass = due ? '' : ' dimmed';
+    return `<div class="note-card${dimClass}" onclick="viewNote(${n.id})">
       ${cat}
-      <div class="note-card-title">${escHtml(n.title)}</div>
+      <div class="note-card-top">
+        <div class="note-card-title">${escHtml(n.title)}</div>
+        <div class="note-badge ${badgeClass}">${label}</div>
+      </div>
       <div class="note-card-preview">${escHtml(preview)}</div>
     </div>`;
   }).join('');
@@ -1555,6 +1648,19 @@ function viewNote(id) {
 
   const container = document.getElementById('notesContent');
   const cat = note.category ? `<div class="note-viewer-category">${escHtml(note.category)}</div>` : '';
+
+  var reviewBar = '';
+  if (isNoteDue(note)) {
+    reviewBar = `<div class="note-review-bar">
+      <button class="note-review-btn again" onclick="rateNote(${note.id}, 0)">Review Again</button>
+      <button class="note-review-btn got-it" onclick="rateNote(${note.id}, 1)">Got It</button>
+    </div>`;
+  } else {
+    var lbl = noteNextReviewLabel(note);
+    reviewBar = `<div class="note-review-bar" style="justify-content:center;border-top:none">
+      <span style="color:var(--text2);font-size:13px">Next review: ${lbl}</span>
+    </div>`;
+  }
 
   container.innerHTML = `
     <div class="note-viewer">
@@ -1568,6 +1674,7 @@ function viewNote(id) {
       <div class="note-viewer-title">${escHtml(note.title)}</div>
       ${cat}
       <div class="note-viewer-content">${formatNoteContent(note.content)}</div>
+      ${reviewBar}
     </div>`;
 }
 
@@ -1682,6 +1789,13 @@ function cleanPreview(content) {
   s = s.replace(/\|/g, ' · ');
   s = s.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
   return s.slice(0, 120);
+}
+
+function rateNote(id, quality) {
+  var note = notes.find(function(n) { return n.id === id; });
+  if (!note) return;
+  reviewNote(note, quality);
+  showNotesList();
 }
 
 function showNotesList() {
