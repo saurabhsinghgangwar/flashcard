@@ -1488,17 +1488,15 @@ function importData(event) {
       }
 
       if (hasNotes) {
-        // Merge: add new notes (by id), update existing
-        const existingIds = new Set(notes.map(n => n.id));
-        let added = 0;
+        // Merge: update existing notes (by id), add new ones
+        let added = 0, updated = 0;
         data.notes.forEach(n => {
-          if (!existingIds.has(n.id)) {
-            notes.push(n);
-            added++;
-          }
+          const i = notes.findIndex(x => x.id === n.id);
+          if (i >= 0) { notes[i] = n; updated++; }   // update existing (title/content changes apply)
+          else { notes.push(n); added++; }            // add new
         });
         saveNotes();
-        msg.push((hasWords ? data.notes.length : added) + ' notes');
+        msg.push(added + ' notes added, ' + updated + ' updated');
       }
 
       if (data.settings) {
