@@ -154,6 +154,17 @@
     color: var(--text2);
     margin-top: 16px;
   }
+  .card-example {
+    font-size: 15px;
+    font-style: italic;
+    color: var(--text2);
+    text-align: center;
+    line-height: 1.4;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--surface2);
+    max-width: 280px;
+  }
   .speak-btn {
     background: none;
     border: none;
@@ -1253,6 +1264,7 @@ function showNextCard() {
             <div class="card-lang">${backLang}</div>
             <div class="card-word">${backWordHtml}</div>
             ${backSpeak}
+            ${currentCard.example ? `<div class="card-example">${escHtml(currentCard.example)}</div>` : ''}
             <div class="card-hint">tap to flip back</div>
           </div>
         </div>
