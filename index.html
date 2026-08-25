@@ -154,17 +154,6 @@
     color: var(--text2);
     margin-top: 16px;
   }
-  .card-example {
-    font-size: 15px;
-    font-style: italic;
-    color: var(--text2);
-    text-align: center;
-    line-height: 1.4;
-    margin-top: 14px;
-    padding-top: 12px;
-    border-top: 1px solid var(--surface2);
-    max-width: 280px;
-  }
   .speak-btn {
     background: none;
     border: none;
@@ -1264,7 +1253,6 @@ function showNextCard() {
             <div class="card-lang">${backLang}</div>
             <div class="card-word">${backWordHtml}</div>
             ${backSpeak}
-            ${currentCard.example ? `<div class="card-example">${escHtml(currentCard.example)}</div>` : ''}
             <div class="card-hint">tap to flip back</div>
           </div>
         </div>
@@ -1612,8 +1600,16 @@ function renderNotesList() {
 
   document.getElementById('noteCount').textContent = `${notes.length} note${notes.length !== 1 ? 's' : ''}`;
 
-  // Sort: due notes first, then by next review date
+  // Sort: IN PROGRESS first, then COVERED, then due, then by next review date
+  function noteRank(n) {
+    var t = n.title || '';
+    if (t.indexOf('IN PROGRESS') !== -1) return 0;
+    if (t.indexOf('COVERED') !== -1) return 1;
+    return 2;
+  }
   const sorted = [...filtered].sort((a, b) => {
+    var ra = noteRank(a), rb = noteRank(b);
+    if (ra !== rb) return ra - rb;
     var aDue = isNoteDue(a) ? 0 : 1;
     var bDue = isNoteDue(b) ? 0 : 1;
     if (aDue !== bDue) return aDue - bDue;
