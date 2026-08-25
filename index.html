@@ -7,27 +7,30 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Karteikarten">
 <title>Karteikarten</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
   :root {
-    --bg: #0f0f0f;
-    --surface: #1a1a1a;
-    --surface2: #252525;
-    --accent: #4a9eff;
-    --accent-dim: #4a9eff22;
-    --green: #34c759;
-    --orange: #ff9f0a;
-    --red: #ff453a;
-    --text: #f5f5f5;
-    --text2: #999;
+    --bg: #1e1f22;
+    --surface: #2b2d30;
+    --surface2: #393b40;
+    --accent: #548af7;
+    --accent-dim: #548af722;
+    --green: #57965c;
+    --orange: #d9a343;
+    --red: #f75464;
+    --text: #dfe1e5;
+    --text2: #9da0a8;
     --radius: 16px;
     --safe-top: env(safe-area-inset-top, 20px);
     --safe-bottom: env(safe-area-inset-bottom, 20px);
   }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Helvetica Neue', sans-serif;
+    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Monaco, 'Cascadia Code', monospace;
     background: var(--bg);
     color: var(--text);
     height: 100vh;
@@ -133,7 +136,7 @@
     justify-content: center;
     padding: 24px;
     background: var(--surface);
-    border: 1px solid #333;
+    border: 1px solid #43454a;
   }
   .card-back { transform: rotateY(180deg); }
   .card-lang {
@@ -218,7 +221,7 @@
     gap: 16px;
     padding: 20px;
     background: var(--surface);
-    border: 1px solid #333;
+    border: 1px solid #43454a;
     border-radius: var(--radius);
     color: var(--text);
     cursor: pointer;
@@ -247,7 +250,7 @@
     width: 100%;
     max-width: 340px;
     background: var(--surface);
-    border: 1px solid #333;
+    border: 1px solid #43454a;
     border-radius: var(--radius);
     padding: 28px 24px;
     text-align: center;
@@ -262,7 +265,7 @@
     width: 100%;
     padding: 14px 16px;
     background: var(--surface);
-    border: 2px solid #333;
+    border: 2px solid #43454a;
     border-radius: 12px;
     color: var(--text);
     font-size: 18px;
@@ -313,7 +316,7 @@
     cursor: pointer;
     transition: background 0.2s;
   }
-  .next-btn:active { background: #333; }
+  .next-btn:active { background: #43454a; }
 
   /* ---- WORDS SCREEN ---- */
   .add-form {
@@ -327,7 +330,7 @@
     flex: 1;
     padding: 14px 16px;
     background: var(--surface);
-    border: 1px solid #333;
+    border: 1px solid #43454a;
     border-radius: 12px;
     color: var(--text);
     font-size: 16px;
@@ -335,7 +338,7 @@
     transition: border-color 0.2s;
   }
   .input-row input:focus { border-color: var(--accent); }
-  .input-row input::placeholder { color: #555; }
+  .input-row input::placeholder { color: #6b6e76; }
   .add-btn {
     padding: 14px;
     background: var(--accent);
@@ -378,7 +381,7 @@
   .word-delete {
     background: none;
     border: none;
-    color: #555;
+    color: #6b6e76;
     font-size: 20px;
     padding: 4px 8px;
     cursor: pointer;
@@ -390,7 +393,7 @@
     width: 100%;
     padding: 12px 16px;
     background: var(--surface);
-    border: 1px solid #333;
+    border: 1px solid #43454a;
     border-radius: 12px;
     color: var(--text);
     font-size: 15px;
@@ -398,7 +401,7 @@
     margin-bottom: 16px;
   }
   .search-input:focus { border-color: var(--accent); }
-  .search-input::placeholder { color: #555; }
+  .search-input::placeholder { color: #6b6e76; }
 
   /* ---- SETTINGS SCREEN ---- */
   .settings-group {
@@ -421,14 +424,14 @@
   .settings-btn {
     padding: 8px 16px;
     background: var(--surface2);
-    border: 1px solid #333;
+    border: 1px solid #43454a;
     border-radius: 8px;
     color: var(--text);
     font-size: 14px;
     cursor: pointer;
     transition: background 0.2s;
   }
-  .settings-btn:active { background: #333; }
+  .settings-btn:active { background: #43454a; }
   .settings-btn.danger { color: var(--red); border-color: var(--red); }
 
 
@@ -467,9 +470,9 @@
   .modal-confirm { background: var(--red); color: #fff; }
 
   /* ---- GENDER COLORS ---- */
-  .gender-der { color: #4a9eff; }
-  .gender-die { color: #ff453a; }
-  .gender-das { color: #34c759; }
+  .gender-der { color: #548af7; }
+  .gender-die { color: #f75464; }
+  .gender-das { color: #57965c; }
   .gender-none { color: var(--text); }
 
   .gender-picker {
@@ -479,7 +482,7 @@
   .gender-btn {
     flex: 1;
     padding: 10px 4px;
-    border: 2px solid #333;
+    border: 2px solid #43454a;
     border-radius: 10px;
     background: var(--surface);
     color: var(--text2);
@@ -489,9 +492,9 @@
     text-align: center;
     transition: border-color 0.2s, color 0.2s, background 0.2s;
   }
-  .gender-btn.sel-der { border-color: #4a9eff; color: #4a9eff; background: #4a9eff15; }
-  .gender-btn.sel-die { border-color: #ff453a; color: #ff453a; background: #ff453a15; }
-  .gender-btn.sel-das { border-color: #34c759; color: #34c759; background: #34c75915; }
+  .gender-btn.sel-der { border-color: #548af7; color: #548af7; background: #548af715; }
+  .gender-btn.sel-die { border-color: #f75464; color: #f75464; background: #f7546415; }
+  .gender-btn.sel-das { border-color: #57965c; color: #57965c; background: #57965c15; }
   .gender-btn.sel-none { border-color: #666; color: var(--text); background: var(--surface2); }
 
   .word-item-gender {
@@ -506,7 +509,7 @@
     width: 100%;
     padding: 12px 16px;
     background: var(--surface);
-    border: 1px solid #333;
+    border: 1px solid #43454a;
     border-radius: 12px;
     color: var(--text);
     font-size: 15px;
@@ -514,7 +517,7 @@
     margin-bottom: 12px;
   }
   .notes-search:focus { border-color: var(--accent); }
-  .notes-search::placeholder { color: #555; }
+  .notes-search::placeholder { color: #6b6e76; }
 
   .notes-add-btn {
     width: 100%;
@@ -542,10 +545,22 @@
     padding: 16px;
     background: var(--surface);
     border-radius: var(--radius);
-    border: 1px solid #333;
+    border: 1px solid #43454a;
     cursor: pointer;
     transition: border-color 0.2s;
   }
+  /* ---- NOTE COLOR CODING (tuned for white bg) ---- */
+  .note-viewer-content .rule,
+  .note-viewer-content .blue  { color:#6ba5ff; font-weight:600; }
+  .note-viewer-content .ex    { color:#6aab73; font-style:italic; }
+  .note-viewer-content .green { color:#6aab73; font-weight:600; }
+  .note-viewer-content .trap,
+  .note-viewer-content .red   { color:#f75464; font-weight:600; }
+  .note-viewer-content .trick,
+  .note-viewer-content .yellow{ color:#ffc66d; font-weight:600; }
+  /* ---- STATUS BADGES ---- */
+  .note-badge.covered     { background:#26382a; color:#7cc47f; }
+  .note-badge.in-progress { background:#2f3d2f; color:#a5d6a7; }
   .note-card:active { border-color: var(--accent); }
   .note-card-title {
     font-size: 16px;
@@ -579,7 +594,7 @@
     border-radius: 6px;
     flex-shrink: 0;
   }
-  .note-badge.due { color: var(--green); background: #34c75922; }
+  .note-badge.due { color: var(--green); background: #57965c22; }
   .note-badge.later { color: var(--text2); background: var(--surface2); }
   .note-card.dimmed { opacity: 0.5; }
   .note-review-bar {
@@ -587,7 +602,7 @@
     gap: 10px;
     margin-top: 20px;
     padding-top: 16px;
-    border-top: 1px solid #333;
+    border-top: 1px solid #43454a;
   }
   .note-review-btn {
     flex: 1;
@@ -637,7 +652,7 @@
   }
   .note-action-btn {
     background: var(--surface2);
-    border: 1px solid #333;
+    border: 1px solid #43454a;
     border-radius: 8px;
     color: var(--text);
     padding: 6px 12px;
@@ -712,7 +727,7 @@
     width: 100%;
     padding: 12px 14px;
     background: var(--surface);
-    border: 1px solid #333;
+    border: 1px solid #43454a;
     border-radius: 10px;
     color: var(--text);
     font-size: 15px;
@@ -754,7 +769,7 @@
   }
   .note-table th, .note-table td {
     padding: 8px 10px;
-    border: 1px solid #333;
+    border: 1px solid #43454a;
     text-align: left;
   }
   .note-table th {
@@ -762,7 +777,7 @@
     font-weight: 600;
     color: var(--text);
   }
-  .note-table tr:nth-child(even) td { background: #1e1e1e; }
+  .note-table tr:nth-child(even) td { background: #2b2d30; }
 
   /* Note lists */
   .note-list {
@@ -849,7 +864,7 @@
   <div class="settings-group">
     <div class="settings-item">
       <div><div class="settings-label">New cards per session</div></div>
-      <select id="newCardsLimit" onchange="saveSettings()" style="background:var(--surface2);color:var(--text);border:1px solid #333;border-radius:8px;padding:8px 12px;font-size:14px;">
+      <select id="newCardsLimit" onchange="saveSettings()" style="background:var(--surface2);color:var(--text);border:1px solid #43454a;border-radius:8px;padding:8px 12px;font-size:14px;">
         <option value="5">5</option>
         <option value="10" selected>10</option>
         <option value="15">15</option>
@@ -918,7 +933,7 @@
 // ===== DATA =====
 let words = []; // { id, de, en, ease, interval, repetitions, nextReview, lastReview }
 let notes = []; // { id, title, category, content, createdAt, updatedAt }
-let settings = { newCardsLimit: 10 };
+let settings = { newCardsLimit: 15 };
 
 const STORAGE_KEY = 'karteikarten_words';
 const SETTINGS_KEY = 'karteikarten_settings';
@@ -943,7 +958,7 @@ function load() {
       }
     });
   } catch(e) {}
-  document.getElementById('newCardsLimit').value = settings.newCardsLimit || 10;
+  document.getElementById('newCardsLimit').value = settings.newCardsLimit || 15;
 }
 
 function save() {
@@ -988,9 +1003,9 @@ function pickGender(g) {
 }
 
 function genderColor(g) {
-  if (g === 'der') return '#4a9eff';
-  if (g === 'die') return '#ff453a';
-  if (g === 'das') return '#34c759';
+  if (g === 'der') return '#548af7';
+  if (g === 'die') return '#f75464';
+  if (g === 'das') return '#57965c';
   return '';
 }
 
@@ -1064,7 +1079,7 @@ function buildReviewQueue() {
   const newCards = due.filter(w => w.repetitions === 0);
 
   // Limit new cards
-  const limit = settings.newCardsLimit || 10;
+  const limit = settings.newCardsLimit || 15;
   const limitedNew = newCards.slice(0, limit);
 
   // Shuffle both
@@ -1087,7 +1102,7 @@ function getDueCount() {
   const due = words.filter(w => w.nextReview <= d);
   const review = due.filter(w => w.repetitions > 0);
   const newCards = due.filter(w => w.repetitions === 0);
-  const limit = settings.newCardsLimit || 10;
+  const limit = settings.newCardsLimit || 15;
   return review.length + Math.min(newCards.length, limit);
 }
 
@@ -1138,7 +1153,7 @@ function showModePicker() {
           ${dueLabel}
         </div>
       </button>
-      <div style="border-top:1px solid #333;margin:8px 0"></div>
+      <div style="border-top:1px solid #43454a;margin:8px 0"></div>
       <button class="mode-btn" onclick="startPracticeAll()">
         <div class="mode-btn-icon" style="font-size:20px">ALL</div>
         <div class="mode-btn-text">
@@ -1277,11 +1292,13 @@ function checkAnswer() {
 
   function normalize(s) { return s.toLowerCase().replace(/[\s ​]+/g, ' ').trim(); }
   function norm(s) { return s.normalize('NFC').toLowerCase().replace(/\s+/g, ' ').trim(); }
-  var g = currentCard.gender && currentCard.gender !== 'none' ? currentCard.gender + ' ' : '';
+  var hasGender = currentCard.gender && currentCard.gender !== 'none';
+  var g = hasGender ? currentCard.gender + ' ' : '';
   var correctFull = norm(g + currentCard.de);
   var correctShort = norm(currentCard.de);
   var given = norm(answer);
-  var isCorrect = given === correctFull || given === correctShort;
+  // Gendered nouns: the article is REQUIRED (strict). Others: article optional.
+  var isCorrect = hasGender ? (given === correctFull) : (given === correctShort || given === correctFull);
 
   inp.disabled = true;
 
@@ -1301,9 +1318,14 @@ function checkAnswer() {
     ratingDiv.innerHTML = `<button class="next-btn" id="nextBtn" onclick="rate(2)">Next</button>`;
   } else {
     inp.classList.add('wrong');
+    // If the noun was right but the article missing/wrong, call it out specifically
+    var articleHint = '';
+    if (hasGender && (given === correctShort || norm(answer.replace(/^(der|die|das)\s+/i,'')) === correctShort)) {
+      articleHint = `<div class="wrong-label" style="color:var(--red)">Article! It's <strong>${currentCard.gender}</strong> ${escHtml(currentCard.de)}</div>`;
+    }
     resultDiv.innerHTML = `
       <div class="wrong-label">Correct answer:</div>
-      <div class="correct-word">${coloredAnswer}</div>${speakBtn}`;
+      <div class="correct-word">${coloredAnswer}</div>${articleHint}${speakBtn}`;
     ratingDiv.innerHTML = `<button class="next-btn" id="nextBtn" onclick="rate(0)">Next</button>`;
   }
 
@@ -1502,7 +1524,7 @@ function importData(event) {
       if (data.settings) {
         settings = data.settings;
         localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-        document.getElementById('newCardsLimit').value = settings.newCardsLimit || 10;
+        document.getElementById('newCardsLimit').value = settings.newCardsLimit || 15;
       }
 
       buildReviewQueue();
@@ -1598,29 +1620,20 @@ function renderNotesList() {
     n.content.toLowerCase().includes(search)
   );
 
-  document.getElementById('noteCount').textContent = `${notes.length} note${notes.length !== 1 ? 's' : ''}`;
-
-  // Sort: IN PROGRESS first, then COVERED, then due, then by next review date
+  // Sort by status: in-progress -> covered -> plain, then alphabetical
   function noteRank(n) {
-    var t = n.title || '';
-    if (t.indexOf('IN PROGRESS') !== -1) return 0;
-    if (t.indexOf('COVERED') !== -1) return 1;
+    if (n.status === 'in-progress') return 0;
+    if (n.status === 'covered') return 1;
     return 2;
   }
   const sorted = [...filtered].sort((a, b) => {
     var ra = noteRank(a), rb = noteRank(b);
     if (ra !== rb) return ra - rb;
-    var aDue = isNoteDue(a) ? 0 : 1;
-    var bDue = isNoteDue(b) ? 0 : 1;
-    if (aDue !== bDue) return aDue - bDue;
-    return (a.nextReview || 0) - (b.nextReview || 0);
+    return (a.title || '').localeCompare(b.title || '');
   });
   const list = document.getElementById('notesList');
 
-  var dueCount = notes.filter(n => isNoteDue(n)).length;
-  document.getElementById('noteCount').textContent = dueCount > 0
-    ? dueCount + ' due · ' + notes.length + ' total'
-    : notes.length + ' note' + (notes.length !== 1 ? 's' : '') + ' · all reviewed';
+  document.getElementById('noteCount').textContent = notes.length + ' note' + (notes.length !== 1 ? 's' : '');
 
   if (sorted.length === 0 && notes.length === 0) {
     list.innerHTML = `<div class="empty-state">
@@ -1633,15 +1646,14 @@ function renderNotesList() {
   list.innerHTML = sorted.map(n => {
     const cat = n.category ? `<div class="note-card-category">${escHtml(n.category)}</div>` : '';
     const preview = cleanPreview(n.content);
-    var due = isNoteDue(n);
-    var label = noteNextReviewLabel(n);
-    var badgeClass = due ? 'due' : 'later';
-    var dimClass = due ? '' : ' dimmed';
-    return `<div class="note-card${dimClass}" onclick="viewNote(${n.id})">
+    var badge = '';
+    if (n.status === 'covered') badge = '<div class="note-badge covered">✓ Covered</div>';
+    else if (n.status === 'in-progress') badge = '<div class="note-badge in-progress">In progress</div>';
+    return `<div class="note-card" onclick="viewNote(${n.id})">
       ${cat}
       <div class="note-card-top">
         <div class="note-card-title">${escHtml(n.title)}</div>
-        <div class="note-badge ${badgeClass}">${label}</div>
+        ${badge}
       </div>
       <div class="note-card-preview">${escHtml(preview)}</div>
     </div>`;
@@ -1655,18 +1667,9 @@ function viewNote(id) {
   const container = document.getElementById('notesContent');
   const cat = note.category ? `<div class="note-viewer-category">${escHtml(note.category)}</div>` : '';
 
-  var reviewBar = '';
-  if (isNoteDue(note)) {
-    reviewBar = `<div class="note-review-bar">
-      <button class="note-review-btn again" onclick="rateNote(${note.id}, 0)">Review Again</button>
-      <button class="note-review-btn got-it" onclick="rateNote(${note.id}, 1)">Got It</button>
-    </div>`;
-  } else {
-    var lbl = noteNextReviewLabel(note);
-    reviewBar = `<div class="note-review-bar" style="justify-content:center;border-top:none">
-      <span style="color:var(--text2);font-size:13px">Next review: ${lbl}</span>
-    </div>`;
-  }
+  var statusBadge = '';
+  if (note.status === 'covered') statusBadge = '<span class="note-badge covered">✓ Covered</span>';
+  else if (note.status === 'in-progress') statusBadge = '<span class="note-badge in-progress">In progress</span>';
 
   container.innerHTML = `
     <div class="note-viewer">
@@ -1677,10 +1680,9 @@ function viewNote(id) {
           <button class="note-action-btn danger" onclick="deleteNote(${note.id})">Delete</button>
         </div>
       </div>
-      <div class="note-viewer-title">${escHtml(note.title)}</div>
+      <div class="note-viewer-title">${escHtml(note.title)} ${statusBadge}</div>
       ${cat}
       <div class="note-viewer-content">${formatNoteContent(note.content)}</div>
-      ${reviewBar}
     </div>`;
 }
 
@@ -1773,9 +1775,11 @@ function fmtInline(text) {
     // Bold: **text** (no color, just bold)
     s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     // Inline code: `text`
-    s = s.replace(/`(.+?)`/g, '<code style="background:#2a2a2a;padding:1px 5px;border-radius:4px;font-size:13px">$1</code>');
-    // Strip all {{tags}} — just show the text inside
-    s = s.replace(/\{\{[a-z]+[ :](.*?)\}\}/g, '$1');
+    s = s.replace(/`(.+?)`/g, '<code style="background:#313438;padding:1px 5px;border-radius:4px;font-size:13px">$1</code>');
+    // Whitelisted color tokens -> spans (escHtml already ran, so XSS-safe)
+    s = s.replace(/\{\{(rule|ex|trap|trick|blue|green|red|yellow)[ :]\s*(.*?)\}\}/g, '<span class="$1">$2</span>');
+    // Any other {{tag: text}} -> plain text
+    s = s.replace(/\{\{[a-z]+[ :]\s*(.*?)\}\}/g, '$1');
     s = s.replace(/\{\{(.*?)\}\}/g, '$1');
     // Arrow: -> to →
     s = s.replace(/-&gt;/g, '→');
