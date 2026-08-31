@@ -1082,11 +1082,11 @@ function buildReviewQueue() {
   const limit = settings.newCardsLimit || 15;
   const limitedNew = newCards.slice(0, limit);
 
-  // Shuffle both
-  shuffle(review);
+  // Most overdue first (oldest nextReview); shuffle only new cards
+  review.sort((a, b) => a.nextReview - b.nextReview);
   shuffle(limitedNew);
 
-  // Review cards first, then new
+  // Review cards first (oldest overdue leading), then new
   reviewQueue = [...review, ...limitedNew];
 }
 
