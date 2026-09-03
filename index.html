@@ -875,10 +875,14 @@
   </div>
 
   <div class="settings-group">
-    <div class="settings-item">
-      <div><div class="settings-label">Backup</div></div>
-      <div style="display:flex;gap:8px" id="backupButtons">
+    <div class="settings-item" style="flex-wrap:wrap">
+      <div><div class="settings-label">Backup</div>
+        <div class="settings-desc" id="backupFolderLabel" style="margin-top:4px;max-width:100%"></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap" id="backupButtons">
         <button class="settings-btn" onclick="exportData()">Download</button>
+        <button class="settings-btn" id="setFolderBtn" onclick="chooseBackupFolder()">Set folder</button>
+        <button class="settings-btn" id="clearFolderBtn" onclick="clearBackupFolder()">Clear folder</button>
         <button class="settings-btn" id="shareBtnMobile" onclick="shareBackup()" style="display:none">Share</button>
         <button class="settings-btn" onclick="document.getElementById('importFile').click()">Import</button>
       </div>
@@ -1443,22 +1447,150 @@ function updateStats() {
 }
 
 // ===== EXPORT / IMPORT =====
-function exportData() {
+var BACKUP_FILENAME = 'karteikarten-backup.json';
+var _dirHandle = null;
+
+// tiny toast for confirmations
+function backupToast(msg) {
+  try {
+    var t = document.createElement('div');
+    t.textContent = msg;
+    t.style.cssText = 'position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:#2b2d31;color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;z-index:9999;box-shadow:0 4px 14px rgba(0,0,0,.4);max-width:88%;text-align:center';
+    document.body.appendChild(t);
+    setTimeout(function(){ t.style.transition='opacity .4s'; t.style.opacity='0'; }, 2200);
+    setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); }, 2700);
+  } catch(e) {}
+}
+
+function _fsSupported() { return (typeof window.showDirectoryPicker === 'function'); }
+
+// --- IndexedDB store for the folder handle (survives reloads) ---
+function _idbOpen() {
+  return new Promise(function(res, rej){
+    var op = indexedDB.open('karteikarten_fs', 1);
+    op.onupgradeneeded = function(){ op.result.createObjectStore('handles'); };
+    op.onsuccess = function(){ res(op.result); };
+    op.onerror = function(){ rej(op.error); };
+  });
+}
+function _idbGet(key) {
+  return _idbOpen().then(function(db){
+    return new Promise(function(res){
+      var rq = db.transaction('handles','readonly').objectStore('handles').get(key);
+      rq.onsuccess = function(){ res(rq.result || null); };
+      rq.onerror = function(){ res(null); };
+    });
+  }).catch(function(){ return null; });
+}
+function _idbSet(key, val) {
+  return _idbOpen().then(function(db){
+    return new Promise(function(res){
+      var tx = db.transaction('handles','readwrite');
+      tx.objectStore('handles').put(val, key);
+      tx.oncomplete = function(){ res(true); };
+      tx.onerror = function(){ res(false); };
+    });
+  }).catch(function(){ return false; });
+}
+
+async function _verifyPermission(handle) {
+  if (!handle || !handle.queryPermission) return false;
+  var opts = { mode: 'readwrite' };
+  try {
+    if ((await handle.queryPermission(opts)) === 'granted') return true;
+    if ((await handle.requestPermission(opts)) === 'granted') return true;
+  } catch(e) {}
+  return false;
+}
+
+// returns a usable dir handle, or null
+async function _getBackupDir() {
+  if (!_fsSupported()) return null;
+  if (_dirHandle && await _verifyPermission(_dirHandle)) return _dirHandle;
+  var stored = await _idbGet('backupDir');
+  if (stored && await _verifyPermission(stored)) { _dirHandle = stored; return stored; }
+  return null;
+}
+
+// user picks the auto-save folder (once)
+async function chooseBackupFolder() {
+  if (!_fsSupported()) {
+    alert("This browser can't auto-save to a folder (e.g. iPhone Safari). Backups will download normally.");
+    return null;
+  }
+  try {
+    var handle = await window.showDirectoryPicker({ mode: 'readwrite', id: 'karteikartenBackup' });
+    if (await _verifyPermission(handle)) {
+      _dirHandle = handle;
+      await _idbSet('backupDir', handle);
+      updateBackupFolderLabel();
+      backupToast('Auto-saving backups to "' + handle.name + '"');
+      return handle;
+    }
+  } catch(e) { /* user cancelled */ }
+  return null;
+}
+
+async function clearBackupFolder() {
+  _dirHandle = null;
+  await _idbSet('backupDir', null);
+  updateBackupFolderLabel();
+  backupToast('Auto-save folder cleared');
+}
+
+function updateBackupFolderLabel() {
+  var el = document.getElementById('backupFolderLabel');
+  if (!el) return;
+  if (!_fsSupported()) { el.textContent = 'Auto-save not supported on this browser - downloads normally.'; return; }
+  el.textContent = _dirHandle
+    ? ('Auto-saving to folder: ' + _dirHandle.name)
+    : 'No folder set - click "Set folder" to auto-save, otherwise downloads normally.';
+}
+
+function _downloadBackupFile(json) {
+  var blob = new Blob([json], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = BACKUP_FILENAME;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function() {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 100);
+}
+
+async function exportData() {
   try {
     var data = { words: words, notes: notes, settings: settings, exportDate: new Date().toISOString() };
     var json = JSON.stringify(data, null, 2);
-    var blob = new Blob([json], { type: 'application/json' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = 'karteikarten-backup.json';
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function() {
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }, 100);
+
+    var dir = await _getBackupDir();
+
+    // First time on a supported browser with no folder set: offer to pick one (once)
+    if (!dir && _fsSupported() && !localStorage.getItem('backupFolderOffered')) {
+      localStorage.setItem('backupFolderOffered', '1');
+      if (confirm('Save backups automatically to a folder?\n\nPick your "german learning" folder once and every future backup will overwrite karteikarten-backup.json there.\n\nCancel to just download normally.')) {
+        dir = await chooseBackupFolder();
+      }
+    }
+
+    if (dir) {
+      try {
+        var fh = await dir.getFileHandle(BACKUP_FILENAME, { create: true });
+        var w = await fh.createWritable();
+        await w.write(json);
+        await w.close();
+        backupToast('Saved to ' + dir.name + '/' + BACKUP_FILENAME);
+        return;
+      } catch(e) {
+        // permission lost / write failed -> fall back to normal download
+      }
+    }
+
+    _downloadBackupFile(json);
   } catch(e) {
     alert('Export error: ' + e.message);
   }
@@ -1909,6 +2041,22 @@ if (/iPhone|iPad|Android/i.test(navigator.userAgent)) {
   var shareBtn = document.getElementById('shareBtnMobile');
   if (shareBtn) shareBtn.style.display = '';
 }
+
+// ----- Backup folder init -----
+(function initBackupFolder(){
+  if (!_fsSupported()) {
+    var sb = document.getElementById('setFolderBtn');
+    var cb = document.getElementById('clearFolderBtn');
+    if (sb) sb.style.display = 'none';
+    if (cb) cb.style.display = 'none';
+    updateBackupFolderLabel();
+    return;
+  }
+  _idbGet('backupDir').then(function(h){
+    if (h) { _dirHandle = h; }
+    updateBackupFolderLabel();
+  });
+})();
 </script>
 <script data-goatcounter="https://saurabh.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
