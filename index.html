@@ -1857,13 +1857,14 @@ function _renderNote(rawText) {
         inTable = true;
         const nextLine = lines[i + 1] || '';
         const isHeader = /^\s*\|?\s*[-:]+[-|:\s]+$/.test(nextLine);
-        const cells = line.split('|').filter(c => c.trim() !== '');
+        const splitRow = (l) => { let p = l.split('|'); if (p.length && p[0].trim() === '') p.shift(); if (p.length && p[p.length-1].trim() === '') p.pop(); return p; };
+        const cells = splitRow(line);
         const tag = isHeader ? 'th' : 'td';
         html += '<tr>' + cells.map(c => `<${tag}>${fmtInline(c.trim())}</${tag}>`).join('') + '</tr>';
         continue;
       }
-      const cells = line.split('|').filter(c => c.trim() !== '');
-      html += '<tr>' + cells.map(c => `<td>${fmtInline(c.trim())}</td>`).join('') + '</tr>';
+      const cells2 = line.split('|'); if (cells2.length && cells2[0].trim() === '') cells2.shift(); if (cells2.length && cells2[cells2.length-1].trim() === '') cells2.pop();
+      html += '<tr>' + cells2.map(c => `<td>${fmtInline(c.trim())}</td>`).join('') + '</tr>';
       continue;
     } else if (inTable) { html += '</table></div>'; inTable = false; }
 
