@@ -1319,7 +1319,7 @@ function checkAnswer() {
   if (isCorrect) {
     inp.classList.add('correct');
     resultDiv.innerHTML = `<div class="correct-word">${coloredAnswer}</div>${speakBtn}`;
-    ratingDiv.innerHTML = `<button class="next-btn" id="nextBtn" onclick="rate(2)">Next</button>`;
+    ratingDiv.innerHTML = `<button class="next-btn" id="nextBtn" onclick="rate(3)">Next</button>`;
   } else {
     inp.classList.add('wrong');
     // If the noun was right but the article missing/wrong, call it out specifically
